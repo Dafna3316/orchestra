@@ -9,45 +9,41 @@ public enum Diatonic {
     /**
      * C/Do
      */
-    C(0),
+    C,
 
     /**
      * D/Re
      */
-    D(2),
+    D,
 
     /**
      * E/Mi
      */
-    E(4),
+    E,
 
     /**
      * F/Fa
      */
-    F(5),
+    F,
 
     /**
      * G/Sol/So
      */
-    G(7),
+    G,
 
     /**
      * A/La
      */
-    A(9),
+    A,
 
     /**
      * B/H/Si/Ti
      */
-    B(11);
+    B;
 
-    /**
-     * The semitones above {@link #C} that this note induces, in 12TET.
-     */
-    public final int semitones;
-
-    private Diatonic(int semitones){
-        this.semitones = semitones;
+    public static Diatonic byOrdinal(final int ordinal) {
+        final var values = values();
+        return values[ordinal % values.length];
     }
 
     /**

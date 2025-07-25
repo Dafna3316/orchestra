@@ -42,7 +42,7 @@ public enum Accidental {
      */
     public final Fraction semitones;
 
-    private Accidental(Fraction semitones) {
+    private Accidental(final Fraction semitones) {
         this.semitones = semitones;
     }
 }

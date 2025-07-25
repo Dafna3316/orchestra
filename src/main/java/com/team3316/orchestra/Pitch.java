@@ -43,7 +43,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch rawMultiply(double factor) {
+    public Pitch rawMultiply(final double factor) {
         return new Pitch(baseFrequency * factor, ratio, semitones);
     }
 
@@ -55,7 +55,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch withBaseFrequency(double baseFrequency) {
+    public Pitch withBaseFrequency(final double baseFrequency) {
         return new Pitch(baseFrequency, ratio, semitones);
     }
 
@@ -67,7 +67,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch withRatio(@NotNull Fraction ratio) {
+    public Pitch withRatio(final @NotNull Fraction ratio) {
         return new Pitch(baseFrequency, ratio, semitones);
     }
 
@@ -79,7 +79,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch withSemis(@NotNull Fraction semitones) {
+    public Pitch withSemis(final @NotNull Fraction semitones) {
         return new Pitch(baseFrequency, ratio, semitones);
     }
 
@@ -91,7 +91,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch upRatio(@NotNull Fraction ratio) {
+    public Pitch upRatio(final @NotNull Fraction ratio) {
         return new Pitch(baseFrequency, this.ratio.multiply(ratio), semitones);
     }
 
@@ -103,7 +103,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch downRatio(@NotNull Fraction ratio) {
+    public Pitch downRatio(final @NotNull Fraction ratio) {
         return upRatio(ratio.reciprocal());
     }
 
@@ -115,7 +115,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch upRatio(int ratio) {
+    public Pitch upRatio(final int ratio) {
         return upRatio(Fraction.of(ratio));
     }
 
@@ -127,7 +127,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch downRatio(int ratio) {
+    public Pitch downRatio(final int ratio) {
         return downRatio(Fraction.of(ratio));
     }
 
@@ -140,7 +140,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch upRatio(int num, int den) {
+    public Pitch upRatio(final int num, final int den) {
         return upRatio(Fraction.of(num, den));
     }
 
@@ -153,7 +153,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch downRatio(int num, int den) {
+    public Pitch downRatio(final int num, final int den) {
         return downRatio(Fraction.of(num, den));
     }
 
@@ -165,7 +165,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch upSemis(@NotNull Fraction semitones) {
+    public Pitch upSemis(@NotNull final Fraction semitones) {
         return new Pitch(baseFrequency, ratio, this.semitones.add(semitones));
     }
 
@@ -177,7 +177,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch downSemis(@NotNull Fraction semitones) {
+    public Pitch downSemis(@NotNull final Fraction semitones) {
         return upSemis(semitones.negate());
     }
 
@@ -189,7 +189,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch upSemis(int semitones) {
+    public Pitch upSemis(final int semitones) {
         return upSemis(Fraction.of(semitones));
     }
 
@@ -201,7 +201,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public Pitch downSemis(int semitones) {
+    public Pitch downSemis(final int semitones) {
         return downSemis(Fraction.of(semitones));
     }
 
@@ -227,7 +227,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public static Pitch of(double baseFrequency) {
+    public static Pitch of(final double baseFrequency) {
         return new Pitch(baseFrequency, DEFAULT_RATIO, DEFAULT_SEMITONES);
     }
 
@@ -239,7 +239,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public static Pitch of(@NotNull Fraction ratio) {
+    public static Pitch of(@NotNull final Fraction ratio) {
         return new Pitch(DEFAULT_FRQUENCY, ratio, DEFAULT_SEMITONES);
     }
 
@@ -252,7 +252,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public static Pitch of(int num, int den) {
+    public static Pitch of(final int num, final int den) {
         return Pitch.of(Fraction.of(num, den));
     }
 
@@ -264,7 +264,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public static Pitch of(int semitones) {
+    public static Pitch of(final int semitones) {
         return new Pitch(DEFAULT_FRQUENCY, DEFAULT_RATIO, Fraction.of(semitones));
     }
 
@@ -279,7 +279,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public static Pitch of(double baseFrequency, int num, int den, int semis) {
+    public static Pitch of(final double baseFrequency, final int num, final int den, final int semis) {
         return new Pitch(baseFrequency, Fraction.of(num, den), Fraction.of(semis));
     }
 
@@ -294,7 +294,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public static Pitch of(double baseFrequency, int num, int den, @NotNull Fraction semis) {
+    public static Pitch of(final double baseFrequency, final int num, final int den, @NotNull final Fraction semis) {
         return new Pitch(baseFrequency, Fraction.of(num, den), semis);
     }
 
@@ -308,7 +308,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public static Pitch of(double baseFrequency, int ratio, Fraction semitones) {
+    public static Pitch of(final double baseFrequency, final int ratio, @NotNull final Fraction semitones) {
         return new Pitch(baseFrequency, Fraction.of(ratio), semitones);
     }
 
@@ -323,7 +323,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     @NotNull
     @Contract(pure = true)
-    public static Pitch of(double baseFrequency, Fraction ratio, int num, int den) {
+    public static Pitch of(final double baseFrequency, @NotNull final Fraction ratio, final int num, final int den) {
         return new Pitch(baseFrequency, ratio, Fraction.of(num, den));
     }
 }

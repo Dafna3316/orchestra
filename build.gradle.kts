@@ -19,6 +19,7 @@ repositories {
 
 dependencies {
     api("org.apache.commons", "commons-numbers-fraction", "1.2")
+    implementation("org.apache.commons", "commons-lang3", "3.18.0")
     compileOnly("org.jetbrains", "annotations", "26.0.2")
 
 	testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")

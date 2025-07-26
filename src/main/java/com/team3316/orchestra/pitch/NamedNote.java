@@ -5,12 +5,13 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import com.team3316.orchestra.pitch.interval.Interval;
+import com.team3316.orchestra.tuning.TuningSystem;
 
 /**
  * A note with a name and an accidental.
  * <p>
  * This doesn't store any frequencies, only an abstract pitch which is to be
- * interpreted by a tuning system.
+ * interpreted by a {@link TuningSystem}.
  */
 public record NamedNote(Diatonic name, Accidental accidental, int octave) {
     /**

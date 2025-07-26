@@ -1,6 +1,5 @@
 package com.team3316.orchestra.tuning.temperament;
 
-import org.apache.commons.numbers.fraction.Fraction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,11 +22,7 @@ public class TwelveTET implements ContextlessIntervalInterpreter, TuningSystem {
     @Override
     @Contract(pure = true)
     public @NotNull Pitch interpret(@NotNull NamedNote note) {
-        return standardPitch
-            .downSemis(referenceName.halfsteps) // Get to middle C
-            .upSemis(note.name().halfsteps) // Get to our note
-            .upSemis(note.accidental().halfsteps) // Apply accidental
-            .upRatio(Fraction.of(2).pow(note.octave() - 1)); // Jump octaves
+        return standardPitch.upSemis(NamedNote.of(referenceName).halfstepsTo(note));
     }
 
     @Override

@@ -36,6 +36,32 @@ jobs:
     - name: Build with Gradle Wrapper
       run: ./gradlew build
 
+    - name: Generate Javadoc
+      run: ./gradlew javadoc
+
+    - name: Upload generated documentation as an artifact
+      id: deployment
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: build/docs/javadoc/
+
+  javadoc:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
   # dependency-submission:
 
   #   runs-on: ubuntu-latest

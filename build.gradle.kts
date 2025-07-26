@@ -7,20 +7,34 @@
 
 plugins {
     `java-library`
+    id("edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin") version "2025.0"
 }
 
 version = "0.1.1"
 group = "com.team3316"
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
+
+    maven {
+        url = uri("https://maven.ctr-electronics.com/release/")
+    }
 }
+wpilibRepositories.addAllReleaseRepositories(project)
 
 dependencies {
+    val wpilibVersion = "2025.3.2"
+
     api("org.apache.commons", "commons-numbers-fraction", "1.2")
     implementation("org.apache.commons", "commons-lang3", "3.18.0")
     compileOnly("org.jetbrains", "annotations", "26.0.2")
+
+    implementation("edu.wpi.first.wpilibj", "wpilibj-java", wpilibVersion)
+    implementation("edu.wpi.first.wpilibNewCommands", "wpilibNewCommands-java", wpilibVersion)
+    implementation("edu.wpi.first.wpiutil", "wpiutil-java", wpilibVersion)
+    // implementation("edu.wpi.first.wpimath", "wpimath-java", wpilibVersion)
+    implementation("edu.wpi.first.wpiunits", "wpiunits-java", wpilibVersion)
+    implementation("com.ctre.phoenix6", "wpiapi-java", "25.4.0")
 
 	testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")

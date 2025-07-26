@@ -17,17 +17,14 @@ public class Kirnberger3 implements TuningSystem {
 
     @Override
     public @NotNull Pitch interpret(@NotNull NamedNote note) {
-        if (note.accidental().halfsteps.getDenominator() != 1) {
+        if (note.accidental().halfsteps.abs().getDenominator() != 1) {
             throw new UnsupportedOperationException("Kirnberger III can't interpret half-accidentals");
         }
 
-        var octaves = note.octave() - referenceNote.octave();
-        var referenceHalfsteps = referenceNote.name().halfsteps + referenceNote.accidental().halfsteps.intValue();
-        var targetHalfsteps = note.name().halfsteps + note.accidental().halfsteps.intValue() - referenceHalfsteps;
-        if (targetHalfsteps >= 12) {
-            targetHalfsteps -= 12;
-            octaves++;
-        } else if (targetHalfsteps < 0) {
+        var targetHalfsteps = referenceNote.halfstepsTo(note).intValue();
+        var octaves = targetHalfsteps / 12;
+        targetHalfsteps -= 12 * octaves;
+        if (targetHalfsteps < 0) {
             targetHalfsteps += 12;
             octaves--;
         }
@@ -62,7 +59,7 @@ public class Kirnberger3 implements TuningSystem {
         this.referenceNote = referenceNote;
         this.referencePitch = referencePitch;
 
-        if (referenceNote.accidental().halfsteps.getDenominator() != 1) {
+        if (referenceNote.accidental().halfsteps.abs().getDenominator() != 1) {
             throw new UnsupportedOperationException("Kirnberger III can't interpret half-accidentals");
         }
     }

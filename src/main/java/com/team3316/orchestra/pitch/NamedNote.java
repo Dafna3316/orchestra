@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import com.team3316.orchestra.pitch.interval.Interval;
+import com.team3316.orchestra.pitch.interval.IntervalDiscriminator;
 import com.team3316.orchestra.tuning.TuningSystem;
 
 /**
@@ -13,7 +14,7 @@ import com.team3316.orchestra.tuning.TuningSystem;
  * This doesn't store any frequencies, only an abstract pitch which is to be
  * interpreted by a {@link TuningSystem}.
  */
-public record NamedNote(Diatonic name, Accidental accidental, int octave) {
+public record NamedNote(Diatonic name, Accidental accidental, int octave) implements Comparable<NamedNote> {
     /**
      * Transpose this note up by a given interval.
      * 
@@ -71,6 +72,55 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) {
 
         return new NamedNote(newName, newAcc, newOctave);
     }
+
+    @Contract(pure = true)
+    public @NotNull Interval intervalTo(final @NotNull NamedNote other) {
+        final var targetHalfstepsFraction = halfstepsTo(other);
+        if (targetHalfstepsFraction.compareTo(Fraction.ZERO) < 0) return other.intervalTo(this);
+        if (targetHalfstepsFraction.abs().getDenominator() != 1)
+            throw new UnsupportedOperationException("Half-intervals aren't supported");
+
+        final var targetHalfsteps = targetHalfstepsFraction.intValue();
+
+        var intervalOrd = other.name.ordinal() - this.name.ordinal();
+        if (intervalOrd < 0) intervalOrd += Interval.NUM_INTERVALS;
+        intervalOrd++;
+
+        if (IntervalDiscriminator.PERFECT.isApplicableTo(intervalOrd)) {
+            var interval = new Interval(intervalOrd, IntervalDiscriminator.PERFECT);
+            var error = (targetHalfsteps % 12) - interval.halfsteps();
+            var disc = IntervalDiscriminator.PERFECT;
+            if (error == 1) disc = IntervalDiscriminator.AUGMENTED;
+            else if (error == -1) disc = IntervalDiscriminator.DIMINISHED;
+            else if (error != 0) throw new UnsupportedOperationException();
+
+            return new Interval(intervalOrd + (Interval.NUM_INTERVALS * (targetHalfsteps / 12)), disc);
+        } else {
+            var interval = new Interval(intervalOrd, IntervalDiscriminator.MAJOR);
+            var error = (targetHalfsteps % 12) - interval.halfsteps();
+            var disc = IntervalDiscriminator.MAJOR;
+            if (error == 1) disc = IntervalDiscriminator.AUGMENTED;
+            else if (error == -1) disc = IntervalDiscriminator.MINOR;
+            else if (error == -2) disc = IntervalDiscriminator.DIMINISHED;
+            else if (error != 0) throw new UnsupportedOperationException();
+
+            return new Interval(intervalOrd + (Interval.NUM_INTERVALS * (targetHalfsteps / 12)), disc);
+        }
+    }
+
+    @Override
+    public int compareTo(NamedNote o) {
+        if (this.octave != o.octave) return this.octave - o.octave;
+        return this.name.ordinal() - o.name.ordinal();
+    }
+
+    @Contract(pure = true)
+    public Fraction halfstepsTo(final @NotNull NamedNote other) {
+        return other.accidental.halfsteps.add(other.name.halfsteps).add((other.octave - 1) * 12).subtract(
+            this.accidental.halfsteps.add(this.name.halfsteps).add((this.octave - 1) * 12)
+        );
+    }
+
     @Contract(pure = true)
     public static @NotNull NamedNote of(@NotNull NamedNote other) {
         return new NamedNote(other.name, other.accidental, other.octave);

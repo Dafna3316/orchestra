@@ -2,6 +2,7 @@ package com.team3316.orchestra.pitch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.apache.commons.numbers.fraction.Fraction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -75,5 +76,21 @@ public class NamedNoteTest {
             new NamedNote(Diatonic.E, Accidental.NATURAL, 2)
                 .down(new Interval(11, IntervalDiscriminator.PERFECT))
         );
+    }
+
+    @Test
+    @DisplayName("halfstepsTo")
+    void halfsteps() {
+        assertEquals(Fraction.of(7), NamedNote.of(Diatonic.C).halfstepsTo(NamedNote.of(Diatonic.G)));
+        assertEquals(Fraction.of(-7), NamedNote.of(Diatonic.G).halfstepsTo(NamedNote.of(Diatonic.C)));
+        assertEquals(Fraction.of(17), NamedNote.of(Diatonic.D, Accidental.FLAT, 1).halfstepsTo(NamedNote.of(Diatonic.F, Accidental.SHARP, 2)));
+    }
+
+    @Test
+    @DisplayName("intervalTo")
+    void intervals() {
+        assertEquals(new Interval(1, IntervalDiscriminator.PERFECT), NamedNote.of(Diatonic.A).intervalTo(NamedNote.of(Diatonic.A)));
+        assertEquals(new Interval(5, IntervalDiscriminator.PERFECT), NamedNote.of(Diatonic.A, 1).intervalTo(NamedNote.of(Diatonic.E, 2)));
+        assertEquals(new Interval(4, IntervalDiscriminator.AUGMENTED), NamedNote.of(Diatonic.A, 1).intervalTo(NamedNote.of(Diatonic.E, Accidental.FLAT, 1)));
     }
 }

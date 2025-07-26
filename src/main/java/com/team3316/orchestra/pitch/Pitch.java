@@ -12,13 +12,15 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * The frequency is stored in three parts:
  * <ul>
- * <li>Base frequency (positive floating-point)</li>
+ * <li>Base frequency (nonnegative floating-point)</li>
  * <li>Just-intonation modifier (positive rational)</li>
  * <li>Semitones (rational)</li>
  * </ul>
  * The reason for this is simple-- I don't trust floating-point arithmetic.
+ * <p>
+ * A base frequency of zero means silence.
  * 
- * @param baseFrequency The base from which the actual frequency is calculated (positive)
+ * @param baseFrequency The base from which the actual frequency is calculated (nonnegative)
  * @param ratio A pure just-intonation ratio to apply to the base frequency (positive)
  * @param semitones Amount of semitones to add to the base frequency
  * 
@@ -31,6 +33,8 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
 
     /**
      * Calculate the real frequency to be heard.
+     * <p>
+     * 0 means silent.
      * @return Effective frequency of this pitch
      */
     public double frequency() {
@@ -214,7 +218,7 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
     }
 
     public Pitch {
-        if (baseFrequency <= 0) throw new IllegalArgumentException("Base frequency must be positive");
+        if (baseFrequency < 0) throw new IllegalArgumentException("Base frequency must be nonnegative");
         if (ratio.compareTo(Fraction.ZERO) <= 0) throw new IllegalArgumentException("Just-intonation ratio must be positive");
     }
 

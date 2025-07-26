@@ -21,7 +21,7 @@
  * <p>
  * The following are both a {@link TuningSystem} and a {@link ContextlessIntervalInterpreter}:
  * <ul>
- * <li>12TET/24TET, implemented by {@link com.team3316.orchestra.tuning.equal.TwelveTET}</li>
+ * <li>12TET/24TET, implemented by {@link com.team3316.orchestra.tuning.temperament.TwelveTET}</li>
  * <li>31TET</li>
  * </ul>
  *
@@ -29,7 +29,7 @@
  * The following are only a {@link TuningSystem}:
  * <ul>
  * <li>¼-comma meantone</li>
- * <li>Kirnberger III</li>
+ * <li>Kirnberger III, implemented by {@link com.team3316.orchestra.tuning.temperament.Kirnberger3}</li>
  * </ul>
  *
  * <p>

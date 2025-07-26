@@ -1,4 +1,4 @@
-package com.team3316.orchestra.tuning.equal;
+package com.team3316.orchestra.tuning.temperament;
 
 import org.apache.commons.numbers.fraction.Fraction;
 import org.jetbrains.annotations.Contract;

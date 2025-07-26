@@ -1,5 +1,7 @@
 package com.team3316.orchestra.pitch;
 
+import java.util.function.DoubleSupplier;
+
 import org.apache.commons.numbers.fraction.Fraction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
  * 
  * @author Jonathan Dafna
  */
-public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Fraction semitones) {
+public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Fraction semitones) implements DoubleSupplier {
     private static final double DEFAULT_FRQUENCY = 440;
     private static final Fraction DEFAULT_RATIO = Fraction.ONE;
     private static final Fraction DEFAULT_SEMITONES = Fraction.ZERO;
@@ -32,6 +34,11 @@ public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Frac
      */
     public double frequency() {
         return baseFrequency * ratio.doubleValue() * Math.pow(2, semitones.divide(Fraction.of(12)).doubleValue());
+    }
+
+    @Override
+    public double getAsDouble() {
+        return frequency();
     }
 
     /**

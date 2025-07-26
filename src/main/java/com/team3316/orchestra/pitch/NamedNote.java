@@ -71,4 +71,31 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) {
 
         return new NamedNote(newName, newAcc, newOctave);
     }
+    @Contract(pure = true)
+    public static @NotNull NamedNote of(@NotNull NamedNote other) {
+        return new NamedNote(other.name, other.accidental, other.octave);
+    }
+
+    @Contract(pure = true)
+    public static @NotNull NamedNote of(@NotNull Diatonic name) {
+        return new NamedNote(name, DEFAULT_ACC, DEFAULT_OCTAVE);
+    }
+
+    @Contract(pure = true)
+    public static @NotNull NamedNote of(@NotNull Diatonic name, int octave) {
+        return new NamedNote(name, DEFAULT_ACC, octave);
+    }
+
+    @Contract(pure = true)
+    public static @NotNull NamedNote of(@NotNull Diatonic name, @NotNull Accidental accidental) {
+        return new NamedNote(name, accidental, DEFAULT_OCTAVE);
+    }
+
+    @Contract(pure = true)
+    public static @NotNull NamedNote of(@NotNull Diatonic name, @NotNull Accidental accidental, int octave) {
+        return new NamedNote(name, accidental, octave);
+    }
+
+    private static final int DEFAULT_OCTAVE = 1;
+    private static final Accidental DEFAULT_ACC = Accidental.NATURAL;
 }

@@ -1,4 +1,4 @@
-package com.team3316.orchestra;
+package com.team3316.orchestra.pitch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

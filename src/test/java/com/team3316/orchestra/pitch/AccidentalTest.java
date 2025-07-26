@@ -11,6 +11,7 @@ public class AccidentalTest {
     @Test
     @DisplayName("All valid fractions")
     void allFractions() {
+        assertEquals(Accidental.NATURAL, Accidental.byHalfsteps(Fraction.ZERO));
         assertEquals(Accidental.FLAT, Accidental.byHalfsteps(Fraction.of(-1)));
         assertEquals(Accidental.SHARP, Accidental.byHalfsteps(Fraction.of(1)));
         assertEquals(Accidental.DOUBLE_FLAT, Accidental.byHalfsteps(Fraction.of(-2)));

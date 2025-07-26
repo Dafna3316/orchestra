@@ -8,6 +8,11 @@ import org.jetbrains.annotations.Nullable;
  */
 public enum Accidental {
     /**
+     * Natrual (0 semitones)
+     */
+    NATURAL(Fraction.ZERO),
+
+    /**
      * ♭ (1 semitone below)
      */
     FLAT(Fraction.of(-1)),

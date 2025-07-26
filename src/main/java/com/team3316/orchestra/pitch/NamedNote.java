@@ -22,18 +22,19 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) {
     @Contract(pure = true)
     @NotNull
     public NamedNote up(@NotNull final Interval interval) {
-        final var newOctave = this.octave + ((interval.ordinal() - 1) / Interval.NUM_INTERVALS);
+        var newOctave = this.octave + interval.octaves();
         final var newName = Diatonic.byOrdinal(this.name.ordinal() + interval.ordinal() - 1);
         final var expectedOffset = interval.halfsteps();
         final int actualOffset; {
             // tfw when you miss let-bindings
             var offset = newName.halfsteps - this.name.halfsteps;
+            if (offset < 0) newOctave++;
             actualOffset = offset < 0 ? offset + 12 : offset;
         }
-        final var error = actualOffset - expectedOffset;
+        final var error = Fraction.of(expectedOffset - actualOffset).add(this.accidental.halfsteps);
 
         // Now we find the correct accidental
-        final var newAcc = Accidental.byHalfsteps(Fraction.of(error));
+        final var newAcc = Accidental.byHalfsteps(error);
 
         if (newAcc == null)
             throw new UnsupportedOperationException("Couldn't find accidental with offset " + error);
@@ -51,17 +52,18 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) {
     @NotNull
     public NamedNote down(@NotNull final Interval interval) {
         // Analogous to up()
-        final var newOctave = this.octave - ((interval.ordinal() - 1) / Interval.NUM_INTERVALS);
+        var newOctave = this.octave - interval.octaves();
         final var newName = Diatonic.byOrdinal(this.name.ordinal() - interval.ordinal() + 1);
         final var expectedOffset = interval.halfsteps();
         final int actualOffset; {
             var offset = this.name.halfsteps - newName.halfsteps;
+            if (offset < 0) newOctave--;
             actualOffset = offset < 0 ? offset + 12 : offset;
         }
-        final var error = actualOffset - expectedOffset;
+        final var error = Fraction.of(expectedOffset - actualOffset).subtract(this.accidental.halfsteps);
 
         // Now we find the correct accidental
-        final var newAcc = Accidental.byHalfsteps(Fraction.of(error));
+        final var newAcc = Accidental.byHalfsteps(error.negate());
 
         if (newAcc == null)
             throw new UnsupportedOperationException("Couldn't find accidental with offset " + error);

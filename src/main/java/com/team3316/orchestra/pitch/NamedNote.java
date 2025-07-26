@@ -73,15 +73,27 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) implem
         return new NamedNote(newName, newAcc, newOctave);
     }
 
+    /**
+     * Compute the interval between this note and another note.
+     * <p>
+     * Negative intervals are not supported; if this note is higher than
+     * {@code other}, the same interval is returned.
+     *
+     * @param other Note to compare
+     * @return Interval between the notes
+     */
     @Contract(pure = true)
     public @NotNull Interval intervalTo(final @NotNull NamedNote other) {
+        // Count half-steps
         final var targetHalfstepsFraction = halfstepsTo(other);
+        // We don't support negatives
         if (targetHalfstepsFraction.compareTo(Fraction.ZERO) < 0) return other.intervalTo(this);
         if (targetHalfstepsFraction.abs().getDenominator() != 1)
             throw new UnsupportedOperationException("Half-intervals aren't supported");
 
         final var targetHalfsteps = targetHalfstepsFraction.intValue();
 
+        // Name of the interval
         var intervalOrd = other.name.ordinal() - this.name.ordinal();
         if (intervalOrd < 0) intervalOrd += Interval.NUM_INTERVALS;
         intervalOrd++;
@@ -114,6 +126,15 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) implem
         return this.name.ordinal() - o.name.ordinal();
     }
 
+    /**
+     * Count half-steps between this note and another note.
+     * <p>
+     * This corresponds to the concept of a <i>semitone</i> in 12TET.
+     * Other tuning systems typically don't have a direct equivalent, but might
+     * still make use of this value.
+     * @param other Another note
+     * @return Number of half-steps between this and {@code other}
+     */
     @Contract(pure = true)
     public Fraction halfstepsTo(final @NotNull NamedNote other) {
         return other.accidental.halfsteps.add(other.name.halfsteps).add((other.octave - 1) * 12).subtract(
@@ -121,26 +142,55 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) implem
         );
     }
 
+    /**
+     * Create a new named note.
+     * @param other Note to copy from
+     * @return New note
+     */
     @Contract(pure = true)
     public static @NotNull NamedNote of(@NotNull NamedNote other) {
         return new NamedNote(other.name, other.accidental, other.octave);
     }
 
+    /**
+     * Create a new named note, with {@link Accidental#NATURAL} and octave 1.
+     * @param name Name of the note
+     * @return New note
+     */
     @Contract(pure = true)
     public static @NotNull NamedNote of(@NotNull Diatonic name) {
         return new NamedNote(name, DEFAULT_ACC, DEFAULT_OCTAVE);
     }
 
+    /**
+     * Create a new named note, with {@link Accidental#NATURAL}.
+     * @param name Name of the note
+     * @param octave Octave of the note
+     * @return New note
+     */
     @Contract(pure = true)
     public static @NotNull NamedNote of(@NotNull Diatonic name, int octave) {
         return new NamedNote(name, DEFAULT_ACC, octave);
     }
 
+    /**
+     * Create a new named note, at octave 1.
+     * @param name Name of the note
+     * @param accidental Accidental of the note
+     * @return New note
+     */
     @Contract(pure = true)
     public static @NotNull NamedNote of(@NotNull Diatonic name, @NotNull Accidental accidental) {
         return new NamedNote(name, accidental, DEFAULT_OCTAVE);
     }
 
+    /**
+     * Create a new named note.
+     * @param name Name of the note
+     * @param accidental Accidental of the note
+     * @param octave Octave of the note
+     * @return New note
+     */
     @Contract(pure = true)
     public static @NotNull NamedNote of(@NotNull Diatonic name, @NotNull Accidental accidental, int octave) {
         return new NamedNote(name, accidental, octave);

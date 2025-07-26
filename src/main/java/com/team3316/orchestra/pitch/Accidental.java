@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public enum Accidental {
     /**
-     * Natrual (0 semitones)
+     * ♮ (0 semitones)
      */
     NATURAL(Fraction.ZERO),
 

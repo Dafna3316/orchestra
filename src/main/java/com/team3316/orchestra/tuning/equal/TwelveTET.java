@@ -13,6 +13,8 @@ import com.team3316.orchestra.tuning.TuningSystem;
 
 /**
  * Twelve-tone equal temperament.
+ * <p>
+ * Actually 24-tone equal temperament.
  */
 public class TwelveTET implements ContextlessIntervalInterpreter, TuningSystem {
     private final Pitch standardPitch;

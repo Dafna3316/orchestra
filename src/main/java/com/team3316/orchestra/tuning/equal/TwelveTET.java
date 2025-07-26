@@ -1,5 +1,6 @@
 package com.team3316.orchestra.tuning.equal;
 
+import org.apache.commons.numbers.fraction.Fraction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +25,7 @@ public class TwelveTET implements ContextlessIntervalInterpreter, TuningSystem {
             .downSemis(referenceName.halfsteps) // Get to middle C
             .upSemis(note.name().halfsteps) // Get to our note
             .upSemis(note.accidental().halfsteps) // Apply accidental
-            .upRatio((int) Math.pow(2, note.octave() - 1)); // Jump octaves
+            .upRatio(Fraction.of(2).pow(note.octave() - 1)); // Jump octaves
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.team3316.orchestra;
+package com.team3316.orchestra.pitch;
 
 import org.apache.commons.numbers.fraction.Fraction;
 import org.jetbrains.annotations.Contract;

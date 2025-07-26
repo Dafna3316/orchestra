@@ -1,4 +1,4 @@
-package com.team3316.orchestra;
+package com.team3316.orchestra.pitch;
 
 /**
  * A diatonic note name: a note of the scale.
@@ -9,41 +9,64 @@ public enum Diatonic {
     /**
      * C/Do
      */
-    C,
+    C(0),
 
     /**
      * D/Re
      */
-    D,
+    D(2),
 
     /**
      * E/Mi
      */
-    E,
+    E(4),
 
     /**
      * F/Fa
      */
-    F,
+    F(5),
 
     /**
      * G/Sol/So
      */
-    G,
+    G(7),
 
     /**
      * A/La
      */
-    A,
+    A(9),
 
     /**
      * B/H/Si/Ti
      */
-    B;
+    B(11);
 
-    public static Diatonic byOrdinal(final int ordinal) {
+    /**
+     * Number of halfsteps above {@link #C}.
+     * <p>
+     * This corresponds to the concept of a <i>semitone</i> in 12TET.
+     * Other tuning systems typically don't have a direct equivalent, but might
+     * still make use of this value.
+     */
+    public final int halfsteps;
+
+    private Diatonic(int halfsteps) {
+        this.halfsteps = halfsteps;
+    }
+
+    /**
+     * Find a diatonic note name by its ordinal.
+     * <p>
+     * Negative values and values with a greater magnitude than 7 are handled.
+     * 
+     * @param ordinal Target ordinal
+     * @return Corresponding diatonic note name
+     */
+    public static Diatonic byOrdinal(int ordinal) {
         final var values = values();
-        return values[ordinal % values.length];
+        ordinal %= values.length;
+        if (ordinal < 0) ordinal += values.length;
+        return values[ordinal];
     }
 
     /**

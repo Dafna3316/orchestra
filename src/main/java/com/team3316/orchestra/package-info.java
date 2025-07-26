@@ -1,13 +1,18 @@
 /**
  * An alternative abstraction over the TalonFX music API with finer control
- * over frequency and tuning than CTRE Orchestra.
+ * over frequency and tuning than CTRE {@code Orchestra}.
  *
- * <h2>Low-level frequency pitch API</h2>
+ * <h2>Pitch/Frequency Control</h2>
+ * This is the main advantage that this library has over the CTRE {@code Orchestra}.
+ * We provide a low-level API for direct control of frequencies, and a high-level
+ * tuning API that can handle varying tuning systems and intervals.
+ *
+ * <h3>Low-level frequency pitch API</h3>
  * For the simplest of uses, {@link Pitch} should
  * be sufficient. It allows tuning by semitones as well as just ratios, but
  * doesn't support note names and intervals.
  *
- * <h2>High-level tuning system API</h2>
+ * <h3>High-level tuning system API</h3>
  * To get note names, one must choose a {@link TuningSystem}. {@link NamedNote}
  * already has support for intervals, so melodies can be created by a pipeline
  * of your {@link NamedNote} into your {@link TuningSystem}.
@@ -21,8 +26,8 @@
  * <p>
  * The following are both a {@link TuningSystem} and a {@link ContextlessIntervalInterpreter}:
  * <ul>
- * <li>12TET/24TET, implemented by {@link com.team3316.orchestra.tuning.temperament.TwelveTET}</li>
- * <li>31TET</li>
+ * <li>12TET/24TET, implemented by {@link com.team3316.orchestra.tuning.temperament.Equal24}</li>
+ * <li>31TET, implemented by {@link com.team3316.orchestra.tuning.temperament.Equal31}</li>
  * </ul>
  *
  * <p>

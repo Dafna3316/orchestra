@@ -11,18 +11,16 @@ import com.team3316.orchestra.tuning.ContextlessIntervalInterpreter;
 import com.team3316.orchestra.tuning.TuningSystem;
 
 /**
- * Twelve-tone equal temperament.
- * <p>
- * Actually 24-tone equal temperament.
+ * 12-tone/24-tone equal temperament.
  */
-public class TwelveTET implements ContextlessIntervalInterpreter, TuningSystem {
-    private final Pitch standardPitch;
-    private static final Diatonic referenceName = Diatonic.A;
+public class Equal24 implements ContextlessIntervalInterpreter, TuningSystem {
+    private final Pitch referencePitch;
+    private final NamedNote referenceNote;
 
     @Override
     @Contract(pure = true)
     public @NotNull Pitch interpret(@NotNull NamedNote note) {
-        return standardPitch.upSemis(NamedNote.of(referenceName).halfstepsTo(note));
+        return referencePitch.upSemis(referenceNote.halfstepsTo(note));
     }
 
     @Override
@@ -38,18 +36,29 @@ public class TwelveTET implements ContextlessIntervalInterpreter, TuningSystem {
     }
 
     /**
-     * Construct a 12TET with the reference pitch being the default of {@link Pitch#Pitch()}.
+     * Construct a 12TET with the reference {@link Diatonic#A A} pitch being the default of {@link Pitch#Pitch()}.
      */
-    public TwelveTET() {
-        standardPitch = new Pitch();
+    public Equal24() {
+        this(NamedNote.of(Diatonic.A), new Pitch());
     }
 
     /**
-     * Construct a 12TET with the given reference pitch being used for A.
-     * 
-     * @param reference Reference pitch
+     * Construct a 12TET with the given reference pitch being used for {@link Diatonic#A A}.
+     *
+     * @param referencePitch Reference pitch
      */
-    public TwelveTET(Pitch reference) {
-        standardPitch = reference;
+    public Equal24(Pitch referencePitch) {
+        this(NamedNote.of(Diatonic.A), referencePitch);
+    }
+
+    /**
+     * Construct a 12TET.
+     *
+     * @param referenceNote Note name corresponding to the reference pitch
+     * @param referencePitch Reference pitch
+     */
+    public Equal24(NamedNote referenceNote, Pitch referencePitch) {
+        this.referencePitch = referencePitch;
+        this.referenceNote = referenceNote;
     }
 }

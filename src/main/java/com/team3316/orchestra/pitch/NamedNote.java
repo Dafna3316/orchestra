@@ -87,7 +87,8 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) implem
         // Count half-steps
         final var targetHalfstepsFraction = halfstepsTo(other);
         // We don't support negatives
-        if (targetHalfstepsFraction.compareTo(Fraction.ZERO) < 0) return other.intervalTo(this);
+        if ((targetHalfstepsFraction.compareTo(Fraction.ZERO) < 0) && (other.name != this.name))
+            return other.intervalTo(this);
         if (targetHalfstepsFraction.abs().getDenominator() != 1)
             throw new UnsupportedOperationException("Half-intervals aren't supported");
 

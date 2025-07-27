@@ -69,6 +69,10 @@ public enum IntervalDiscriminator {
         };
     }
 
+    /**
+     * @hidden
+     * @return .
+     */
     @ApiStatus.Internal
     public int halfstepsFromPerfect() {
         return switch (this) {
@@ -85,6 +89,11 @@ public enum IntervalDiscriminator {
         };
     }
 
+    /**
+     * @hidden
+     * @param halfsteps .
+     * @return .
+     */
     @ApiStatus.Internal
     public static IntervalDiscriminator byHalfstepsFromPerfect(int halfsteps) {
         return switch (halfsteps) {
@@ -101,6 +110,10 @@ public enum IntervalDiscriminator {
         };
     }
 
+    /**
+     * @hidden
+     * @return .
+     */
     @ApiStatus.Internal
     public int halfstepsFromMajor() {
         return switch (this) {
@@ -118,6 +131,11 @@ public enum IntervalDiscriminator {
         };
     }
 
+    /**
+     * @hidden
+     * @param halfsteps .
+     * @return .
+     */
     @ApiStatus.Internal
     public static IntervalDiscriminator byHalfstepsFromMajor(int halfsteps) {
         return switch (halfsteps) {

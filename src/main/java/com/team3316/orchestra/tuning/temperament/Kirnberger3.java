@@ -1,5 +1,7 @@
 package com.team3316.orchestra.tuning.temperament;
 
+import java.io.Serializable;
+
 import org.apache.commons.numbers.fraction.Fraction;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,11 +12,10 @@ import com.team3316.orchestra.tuning.TuningSystem;
 
 /**
  * Kirnberger III temperament on a given base note.
+ * @param referenceNote Base note name of the system
+ * @param referencePitch Pitch that the base note should be mapped to
  */
-public class Kirnberger3 implements TuningSystem {
-    private final NamedNote referenceNote;
-    private final Pitch referencePitch;
-
+public record Kirnberger3(NamedNote referenceNote, Pitch referencePitch) implements TuningSystem, Serializable {
     @Override
     public @NotNull Pitch interpret(@NotNull NamedNote note) {
         if (note.accidental().halfsteps.abs().getDenominator() != 1) {
@@ -49,16 +50,7 @@ public class Kirnberger3 implements TuningSystem {
         return basePitch.upRatio(Fraction.of(2).pow(octaves));
     }
 
-    /**
-     * Construct a Kirnberger III temperament on a given base note.
-     *
-     * @param referenceNote Base note name of the system
-     * @param referencePitch Pitch that the base note should be mapped to
-     */
-    public Kirnberger3(NamedNote referenceNote, Pitch referencePitch) {
-        this.referenceNote = referenceNote;
-        this.referencePitch = referencePitch;
-
+    public Kirnberger3 {
         if (referenceNote.accidental().halfsteps.abs().getDenominator() != 1) {
             throw new UnsupportedOperationException("Kirnberger III can't interpret half-accidentals");
         }

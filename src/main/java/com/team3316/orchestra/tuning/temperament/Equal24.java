@@ -1,5 +1,7 @@
 package com.team3316.orchestra.tuning.temperament;
 
+import java.io.Serializable;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,11 +14,10 @@ import com.team3316.orchestra.tuning.TuningSystem;
 
 /**
  * 12-tone/24-tone equal temperament.
+ * @param referenceNote Note name corresponding to the reference pitch
+ * @param referencePitch Reference pitch
  */
-public class Equal24 implements ContextlessIntervalInterpreter, TuningSystem {
-    private final Pitch referencePitch;
-    private final NamedNote referenceNote;
-
+public record Equal24(NamedNote referenceNote, Pitch referencePitch) implements ContextlessIntervalInterpreter, TuningSystem, Serializable {
     @Override
     @Contract(pure = true)
     public @NotNull Pitch interpret(@NotNull NamedNote note) {
@@ -49,16 +50,5 @@ public class Equal24 implements ContextlessIntervalInterpreter, TuningSystem {
      */
     public Equal24(Pitch referencePitch) {
         this(NamedNote.of(Diatonic.A), referencePitch);
-    }
-
-    /**
-     * Construct a 12TET.
-     *
-     * @param referenceNote Note name corresponding to the reference pitch
-     * @param referencePitch Reference pitch
-     */
-    public Equal24(NamedNote referenceNote, Pitch referencePitch) {
-        this.referencePitch = referencePitch;
-        this.referenceNote = referenceNote;
     }
 }

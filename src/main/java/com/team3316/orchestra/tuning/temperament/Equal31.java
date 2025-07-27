@@ -1,5 +1,7 @@
 package com.team3316.orchestra.tuning.temperament;
 
+import java.io.Serializable;
+
 import org.apache.commons.numbers.fraction.Fraction;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,11 +15,10 @@ import com.team3316.orchestra.tuning.TuningSystem;
 
 /**
  * 31-tone equal temperament.
+ * @param referenceNote Reference note
+ * @param referencePitch Pitch correspondign to reference note
  */
-public class Equal31 implements TuningSystem, ContextlessIntervalInterpreter {
-    private final NamedNote referenceNote;
-    private final Pitch referencePitch;
-
+public record Equal31(NamedNote referenceNote, Pitch referencePitch) implements TuningSystem, ContextlessIntervalInterpreter, Serializable {
     private static final Fraction DIESIS_TO_SEMITONE = Fraction.of(12, 31);
 
     @Override
@@ -88,16 +89,6 @@ public class Equal31 implements TuningSystem, ContextlessIntervalInterpreter {
             case _DIMINISHED4 -> -10;
             case PERFECT -> throw new IllegalArgumentException("Perfect discriminator passed to imperfect");
         };
-    }
-
-    /**
-     * Create a new 31TET.
-     * @param referenceNote Reference note
-     * @param referencePitch Pitch correspondign to reference note
-     */
-    public Equal31(NamedNote referenceNote, Pitch referencePitch) {
-        this.referenceNote = referenceNote;
-        this.referencePitch = referencePitch;
     }
 
     /**

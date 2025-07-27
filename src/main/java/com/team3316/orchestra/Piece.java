@@ -2,6 +2,7 @@ package com.team3316.orchestra;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -14,12 +15,12 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public record Piece(Tempo tempo, Collection<Voice> voices) {
+public record Piece(Tempo tempo, Collection<Supplier<Voice>> voices) {
     public Command playEagerly(Orchestra orchestra) {
         verifyOrchestra(orchestra);
         return new EagerPlayCommand(
             voices.stream()
-                .map(v -> voiceToDTFs(v, tempo))
+                .map(v -> voiceToDTFs(v.get(), tempo))
                 .toArray(i -> new DirectlyTimedFrequency[i][]),
             orchestra
         );

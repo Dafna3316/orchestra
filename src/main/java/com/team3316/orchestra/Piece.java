@@ -48,6 +48,10 @@ public record Piece(Tempo tempo, Collection<? extends VoiceSupplier> voices) imp
         return new LazyPlayCommand(voices, tempo, orchestra);
     }
 
+    /**
+     * Evaluate all {@link VoiceSupplier}s to actual {@link Voice}s.
+     * @return New piece with voices evaluated
+     */
     public Piece evaluateVoices() {
         return new Piece(tempo, voices.stream().map(Supplier::get).toList());
     }

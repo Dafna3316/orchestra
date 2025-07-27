@@ -23,8 +23,6 @@ import org.jetbrains.annotations.NotNull;
  * @param baseFrequency The base from which the actual frequency is calculated (nonnegative)
  * @param ratio A pure just-intonation ratio to apply to the base frequency (positive)
  * @param semitones Amount of semitones to add to the base frequency
- * 
- * @author Jonathan Dafna
  */
 public record Pitch(double baseFrequency, @NotNull Fraction ratio, @NotNull Fraction semitones) implements DoubleSupplier, Serializable {
     private static final double DEFAULT_FRQUENCY = 440;

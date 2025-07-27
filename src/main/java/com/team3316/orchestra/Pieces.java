@@ -11,7 +11,13 @@ import com.team3316.orchestra.time.Timed;
 import com.team3316.orchestra.tuning.temperament.Equal24;
 import com.team3316.orchestra.voice.Voice;
 
+/**
+ * A collection of built-in pieces
+ */
 public final class Pieces {
+    /**
+     * כשאור דולק בחלונך
+     */
     public static final Piece OR = new Piece(new Tempo(Fraction.of(1, 4), Tempo.BPM.of(96)), List.of(
         Voice.NoteBuilder.of(List.of(
             Timed.of(NamedNote.of(Diatonic.D, 2), Fraction.of(1, 4)),
@@ -35,5 +41,6 @@ public final class Pieces {
             Timed.of(NamedNote.of(Diatonic.G, 1), Fraction.of(1, 2))
         ), new Equal24()).pitches()
     ));
+
     private Pieces() {}
 }

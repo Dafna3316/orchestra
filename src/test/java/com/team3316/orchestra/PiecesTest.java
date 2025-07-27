@@ -27,4 +27,21 @@ public class PiecesTest {
             assertEquals(Pieces.OR, p);
         }
     }
+
+    @Test
+    @DisplayName("Log OR")
+    void log() {
+        logPiece(Pieces.OR);
+    }
+
+    public static void logPiece(Piece piece) {
+        System.out.println("===PIECE===");
+        for (final var voice : piece.voices()) {
+            System.out.println("===VOICE===");
+            for (final var freq : voice.get().frequencies()) {
+                System.out.printf("%d/%d: %f\n", freq.duration().getNumerator(), freq.duration().getDenominator(), freq.frequency());
+            }
+        }
+        System.out.println("======");
+    }
 }

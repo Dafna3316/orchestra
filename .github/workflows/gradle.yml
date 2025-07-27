@@ -47,6 +47,7 @@ jobs:
 
   javadoc:
     runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/heads/') }}
     needs: build
     permissions:
       contents: read

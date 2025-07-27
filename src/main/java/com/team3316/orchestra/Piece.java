@@ -57,7 +57,7 @@ public record Piece(Tempo tempo, Collection<Supplier<Voice>> voices) {
         double acc = 0;
         for (int i = 0; i < voice.frequencies().length; i++) {
             dtfs[i] = new DirectlyTimedFrequency(voice.frequencies()[i].frequency(), acc);
-            acc += voice.frequencies()[i].duration().divide(tempo.duration()).doubleValue() / tempo.frequency().in(Units.Hertz);
+            acc += tempo.interpret(voice.frequencies()[i].duration()).in(Units.Seconds);
         }
         dtfs[dtfs.length - 1] = new DirectlyTimedFrequency(0, acc);
 
@@ -175,7 +175,7 @@ class LazyPlayCommand extends Command {
                 final var note = freqs[progress[i]];
                 players[i].setControl(new MusicTone(note.frequency()));
                 progress[i]++;
-                nextNote[i] += note.duration().divide(tempo.duration()).doubleValue() / tempo.frequency().in(Units.Hertz);
+                nextNote[i] += tempo.interpret(note.duration()).in(Units.Seconds);
             }
             i++;
         }

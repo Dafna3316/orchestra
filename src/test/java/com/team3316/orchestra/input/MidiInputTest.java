@@ -12,7 +12,6 @@ import javax.sound.midi.InvalidMidiDataException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.team3316.orchestra.Piece;
 import com.team3316.orchestra.PiecesTest;
 
 public class MidiInputTest {

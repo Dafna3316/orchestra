@@ -10,8 +10,10 @@ import com.team3316.orchestra.tuning.TuningSystem;
 
 /**
  * Generic pitch with note value.
+ * @param <P> Wrapped object
  * @param pitch Pitch or note name
  * @param duration Note value
+ * @param isRest Whether this represents a rest
  */
 public record Timed<P>(P pitch, Fraction duration, boolean isRest) implements Serializable {
     public Timed {
@@ -19,10 +21,23 @@ public record Timed<P>(P pitch, Fraction duration, boolean isRest) implements Se
             throw new IllegalArgumentException("Negative duration");
     }
 
+    /**
+     * Create a timed object.
+     * @param <P> Wrapped object
+     * @param pitch Object
+     * @param duration Duration
+     * @return Timed object
+     */
     public static <P> Timed<P> of(P pitch, Fraction duration) {
         return new Timed<>(pitch, duration, false);
     }
 
+    /**
+     * Create a timed rest.
+     * @param <P> Anything really
+     * @param duration Duration
+     * @return Rest with given duration
+     */
     public static <P> Timed<P> rest(Fraction duration) {
         return new Timed<>(null, duration, true);
     }

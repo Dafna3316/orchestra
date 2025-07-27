@@ -5,6 +5,7 @@ import org.apache.commons.numbers.fraction.Fraction;
 import edu.wpi.first.units.FrequencyUnit;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.Time;
 
 /**
  * Musical tempo direction.
@@ -18,4 +19,13 @@ public record Tempo(Fraction duration, Frequency frequency) {
      * Beats per minute unit.
      */
     public static final FrequencyUnit BPM = Units.Value.per(Units.Minute);
+
+    /**
+     * Realize a note value in this tempo.
+     * @param duration Input value
+     * @return Actual duration
+     */
+    public Time interpret(Fraction duration) {
+        return Units.Value.of(duration.divide(duration()).doubleValue()).times(frequency.asPeriod());
+    }
 }

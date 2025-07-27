@@ -12,6 +12,9 @@ import javax.sound.midi.InvalidMidiDataException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.team3316.orchestra.Piece;
+import com.team3316.orchestra.PiecesTest;
+
 public class MidiInputTest {
     @Test
     @DisplayName("MIDI over the internet")
@@ -22,12 +25,7 @@ public class MidiInputTest {
         System.setErr(new PrintStream(fakeErr));
 
         final var piece = MidiInput.open(new URL("http://www.jsbach.net/midi/1080-c01.mid"));
-        for (final var voice : piece.voices()) {
-            System.out.println("======");
-            for (final var freq : voice.get().frequencies()) {
-                System.out.printf("%d/%d: %f\n", freq.duration().getNumerator(), freq.duration().getDenominator(), freq.frequency());
-            }
-        }
+        PiecesTest.logPiece(piece);
 
         System.setErr(realErr);
         System.err.write(fakeErr.toByteArray());

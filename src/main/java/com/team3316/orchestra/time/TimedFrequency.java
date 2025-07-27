@@ -2,8 +2,6 @@ package com.team3316.orchestra.time;
 
 import org.apache.commons.numbers.fraction.Fraction;
 
-import com.team3316.orchestra.pitch.Pitch;
-
 /**
  * Like {@link Timed}, but for {@code double}.
  * @param frequency Frequency (in Hertz)

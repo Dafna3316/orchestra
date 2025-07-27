@@ -80,6 +80,8 @@ class EagerPlayCommand extends Command {
     public void execute() {
         int i = 0;
         for (final var voice : voices) {
+            if (progress[i] >= voice.length) continue;
+
             final var note = voice[progress[i]];
             if (note.start() <= metronome.get()) {
                 players[i].setControl(new MusicTone(note.frequency()));

@@ -15,10 +15,20 @@ public interface Orchestra extends Subsystem {
      */
     TalonFX[] getPlayers();
 
+    /**
+     * Make a {@link Command} to play a piece, and evaluate everything at the call site.
+     * @param piece Piece to play
+     * @return Command that plays {@code piece}
+     */
     default Command playEagerly(Piece piece) {
         return piece.playEagerly(this);
     }
 
+    /**
+     * Make a {@link Command} to play a piece, and compute as needed.
+     * @param piece Piece to play
+     * @return Command that plays {@code piece}
+     */
     default Command playLazily(Piece piece) {
         return piece.playLazily(this);
     }

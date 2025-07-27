@@ -12,6 +12,10 @@ import com.team3316.orchestra.pitch.NamedNote;
 import com.team3316.orchestra.pitch.Pitch;
 import com.team3316.orchestra.tuning.TuningSystem;
 
+/**
+ * List of timed frequencies.
+ * @param frequencies Frequencies
+ */
 public record Voice(TimedFrequency[] frequencies) implements Supplier<Voice> {
     public static Voice of(List<TimedFrequency> frequencies) {
         return FrequencyBuilder.of(frequencies).build();

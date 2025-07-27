@@ -1,6 +1,5 @@
 package com.team3316.orchestra.voice;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +19,7 @@ import com.team3316.orchestra.tuning.TuningSystem;
  * List of timed frequencies.
  * @param frequencies Frequencies
  */
-public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSupplier, Serializable {
+public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSupplier {
     /**
      * Create a voice builder.
      * @return New builder

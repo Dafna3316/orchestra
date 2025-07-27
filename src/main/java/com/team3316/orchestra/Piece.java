@@ -19,6 +19,12 @@ import edu.wpi.first.wpilibj2.command.Command;
  * @param voices Voices of this piece
  */
 public record Piece(Tempo tempo, Collection<Supplier<Voice>> voices) {
+    /**
+     * Create a command the plays this piece using {@code orchestra}.
+     * Timing is calculated at the time of call.
+     * @param orchestra Target orchestra
+     * @return Command that plays this piece
+     */
     public Command playEagerly(Orchestra orchestra) {
         verifyOrchestra(orchestra);
         return new EagerPlayCommand(
@@ -29,6 +35,12 @@ public record Piece(Tempo tempo, Collection<Supplier<Voice>> voices) {
         );
     }
 
+    /**
+     * Create a command that plays this piece using {@code orchestra}.
+     * Timing is calculated as needed.
+     * @param orchestra Target orchestra
+     * @return Command that plays this piece
+     */
     public Command playLazily(Orchestra orchestra) {
         verifyOrchestra(orchestra);
         return new LazyPlayCommand(voices, tempo, orchestra);
@@ -39,6 +51,7 @@ public record Piece(Tempo tempo, Collection<Supplier<Voice>> voices) {
             throw new IllegalArgumentException("Orchestra must have as many or more voices than piece");
     }
 
+    // oh yes
     private static DirectlyTimedFrequency[] voiceToDTFs(Voice voice, Tempo tempo) {
         final var dtfs = new DirectlyTimedFrequency[voice.frequencies().length + 1];
         double acc = 0;

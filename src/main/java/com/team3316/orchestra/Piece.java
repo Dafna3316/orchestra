@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.team3316.orchestra.time.Tempo;
@@ -15,6 +13,11 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
+/**
+ * Piece of music.
+ * @param tempo Tempo of this piece
+ * @param voices Voices of this piece
+ */
 public record Piece(Tempo tempo, Collection<Supplier<Voice>> voices) {
     public Command playEagerly(Orchestra orchestra) {
         verifyOrchestra(orchestra);
@@ -28,7 +31,7 @@ public record Piece(Tempo tempo, Collection<Supplier<Voice>> voices) {
 
     public Command playLazily(Orchestra orchestra) {
         verifyOrchestra(orchestra);
-        throw new NotImplementedException();
+        return new LazyPlayCommand(voices, tempo, orchestra);
     }
 
     private void verifyOrchestra(Orchestra orchestra) {
@@ -71,6 +74,7 @@ class EagerPlayCommand extends Command {
     @Override
     public void initialize() {
         metronome.restart();
+        Arrays.fill(progress, 0);
         for (final var player : players) {
             player.setControl(new MusicTone(0));
         }
@@ -96,6 +100,79 @@ class EagerPlayCommand extends Command {
         int i = 0;
         for (final var voice : voices) {
             if (progress[i] < voice.length) return false;
+            i++;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        for (final var player : players) {
+            player.setControl(new MusicTone(0));
+        }
+        metronome.stop();
+    }
+}
+
+class LazyPlayCommand extends Command {
+    private final Timer metronome;
+    private final Tempo tempo;
+    private final Voice[] voices;
+    private final TalonFX[] players;
+    private int[] progress; // Indices
+    private double[] nextNote; // Seconds
+
+    public LazyPlayCommand(Collection<Supplier<Voice>> voices, Tempo tempo, Orchestra orchestra) {
+        addRequirements(orchestra);
+        this.metronome = new Timer();
+        this.tempo = tempo;
+        this.voices = voices.stream().map(Supplier::get).toArray(len -> new Voice[len]);
+        this.players = orchestra.getPlayers();
+        this.progress = new int[this.voices.length];
+        this.nextNote = new double[this.voices.length];
+
+        Arrays.fill(progress, 0);
+        Arrays.fill(nextNote, 0);
+        assert this.voices.length <= players.length;
+    }
+
+    @Override
+    public void initialize() {
+        metronome.restart();
+        Arrays.fill(progress, 0);
+        Arrays.fill(nextNote, 0);
+        for (final var player : players) {
+            player.setControl(new MusicTone(0));
+        }
+    }
+
+    @Override
+    public void execute() {
+        int i = 0;
+        for (final var voice : voices) {
+            final var freqs = voice.frequencies();
+
+            if (nextNote[i] <= metronome.get()) {
+                if (progress[i] >= freqs.length) {
+                    players[i].setControl(new MusicTone(0));
+                    continue;
+                }
+
+                final var note = freqs[progress[i]];
+                players[i].setControl(new MusicTone(note.frequency()));
+                progress[i]++;
+                nextNote[i] += note.duration().divide(tempo.duration()).doubleValue() / tempo.frequency().in(Units.Hertz);
+            }
+            i++;
+        }
+    }
+
+    @Override
+    public boolean isFinished() {
+        int i = 0;
+        for (final var voice : voices) {
+            if (progress[i] <= voice.frequencies().length) return false;
             i++;
         }
 

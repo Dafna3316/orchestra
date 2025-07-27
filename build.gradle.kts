@@ -30,10 +30,10 @@ dependencies {
     compileOnly("org.jetbrains", "annotations", "26.0.2")
 
     implementation("edu.wpi.first.wpilibj", "wpilibj-java", wpilibVersion)
-    implementation("edu.wpi.first.wpilibNewCommands", "wpilibNewCommands-java", wpilibVersion)
+    api("edu.wpi.first.wpilibNewCommands", "wpilibNewCommands-java", wpilibVersion)
     implementation("edu.wpi.first.wpiutil", "wpiutil-java", wpilibVersion)
     // implementation("edu.wpi.first.wpimath", "wpimath-java", wpilibVersion)
-    implementation("edu.wpi.first.wpiunits", "wpiunits-java", wpilibVersion)
+    api("edu.wpi.first.wpiunits", "wpiunits-java", wpilibVersion)
     implementation("com.ctre.phoenix6", "wpiapi-java", "25.4.0")
 
 	testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")

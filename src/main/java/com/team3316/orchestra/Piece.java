@@ -1,11 +1,9 @@
 package com.team3316.orchestra;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import com.ctre.phoenix6.controls.MusicTone;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * @param tempo Tempo of this piece
  * @param voices Voices of this piece
  */
-public record Piece(Tempo tempo, Collection<VoiceSupplier> voices) implements Serializable {
+public record Piece(Tempo tempo, Collection<? extends VoiceSupplier> voices) implements Serializable {
     /**
      * Create a command the plays this piece using {@code orchestra}.
      * Timing is calculated at the time of call.
@@ -51,10 +49,7 @@ public record Piece(Tempo tempo, Collection<VoiceSupplier> voices) implements Se
     }
 
     public Piece evaluateVoices() {
-        return new Piece(tempo, voices.stream()
-            .map(Supplier::get)
-            .collect(Collectors.toCollection(() -> new ArrayList<>(voices.size())))
-        );
+        return new Piece(tempo, voices.stream().map(Supplier::get).toList());
     }
 
     private void verifyOrchestra(Orchestra orchestra) {
@@ -147,7 +142,7 @@ class LazyPlayCommand extends Command {
     private int[] progress; // Indices
     private double[] nextNote; // Seconds
 
-    public LazyPlayCommand(Collection<VoiceSupplier> voices, Tempo tempo, Orchestra orchestra) {
+    public LazyPlayCommand(Collection<? extends VoiceSupplier> voices, Tempo tempo, Orchestra orchestra) {
         addRequirements(orchestra);
         this.metronome = new Timer();
         this.tempo = tempo;

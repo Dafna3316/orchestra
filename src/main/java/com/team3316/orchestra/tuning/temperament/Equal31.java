@@ -2,7 +2,6 @@ package com.team3316.orchestra.tuning.temperament;
 
 import org.apache.commons.numbers.fraction.Fraction;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.ApiStatus;
 
 import com.team3316.orchestra.pitch.Diatonic;
 import com.team3316.orchestra.pitch.NamedNote;
@@ -15,7 +14,6 @@ import com.team3316.orchestra.tuning.TuningSystem;
 /**
  * 31-tone equal temperament.
  */
-@ApiStatus.Experimental
 public class Equal31 implements TuningSystem, ContextlessIntervalInterpreter {
     private final NamedNote referenceNote;
     private final Pitch referencePitch;
@@ -32,13 +30,9 @@ public class Equal31 implements TuningSystem, ContextlessIntervalInterpreter {
         return original.downSemis(DIESIS_TO_SEMITONE.multiply(diesesOf(interval)));
     }
 
-    /**
-     * Warning: this doesn't work in general
-     */
     @Override
-    @ApiStatus.Experimental
     public @NotNull Pitch interpret(@NotNull NamedNote note) {
-        // TODO Do this properly
+        // Very lazy, but it works
         return referencePitch.upSemis(
             DIESIS_TO_SEMITONE
                 .multiply(diesesOf(referenceNote.intervalTo(note)))
@@ -69,7 +63,13 @@ public class Equal31 implements TuningSystem, ContextlessIntervalInterpreter {
             case PERFECT -> 0;
             case AUGMENTED -> 2;
             case DIMINISHED -> -2;
-            default -> throw new IllegalArgumentException("Imperfect discriminator passed to perfect");
+            case _AUGMENTED2 -> 4;
+            case _AUGMENTED3 -> 6;
+            case _AUGMENTED4 -> 8;
+            case _DIMINISHED2 -> -4;
+            case _DIMINISHED3 -> -6;
+            case _DIMINISHED4 -> -8;
+            case MAJOR, MINOR -> throw new IllegalArgumentException("Imperfect discriminator passed to perfect");
         };
     }
 
@@ -80,7 +80,13 @@ public class Equal31 implements TuningSystem, ContextlessIntervalInterpreter {
             case MINOR -> -2;
             case AUGMENTED -> 2;
             case DIMINISHED -> -4;
-            default -> throw new IllegalArgumentException("Perfect discriminator passed to imperfect");
+            case _AUGMENTED2 -> 4;
+            case _AUGMENTED3 -> 6;
+            case _AUGMENTED4 -> 8;
+            case _DIMINISHED2 -> -6;
+            case _DIMINISHED3 -> -8;
+            case _DIMINISHED4 -> -10;
+            case PERFECT -> throw new IllegalArgumentException("Perfect discriminator passed to imperfect");
         };
     }
 

@@ -84,13 +84,8 @@ public record Interval(int ordinal, @NotNull IntervalDiscriminator discriminator
             case 5 -> 7;
             default -> throw new IllegalArgumentException("Tried to extract perfect offset of imperfect interval");
         };
-        
-        return switch (interval.discriminator()) {
-            case PERFECT -> perfectOffset;
-            case AUGMENTED -> perfectOffset + 1;
-            case DIMINISHED -> perfectOffset - 1;
-            default -> throw new IllegalArgumentException("Illegal interval: " + interval);
-        };
+
+        return perfectOffset + interval.discriminator.halfstepsFromPerfect();
     }
 
     private static int expectedImperfectOffset(final Interval interval) {
@@ -103,12 +98,6 @@ public record Interval(int ordinal, @NotNull IntervalDiscriminator discriminator
             default -> throw new IllegalArgumentException("Tried to extract major offset of perfect interval");
         };
         
-        return switch (interval.discriminator()) {
-            case MAJOR -> majorOffset;
-            case MINOR -> majorOffset - 1;
-            case AUGMENTED -> majorOffset + 1;
-            case DIMINISHED -> majorOffset - 2;
-            default -> throw new IllegalArgumentException("Illegal interval: " + interval);
-        };
+        return majorOffset + interval.discriminator.halfstepsFromMajor();
     }
 }

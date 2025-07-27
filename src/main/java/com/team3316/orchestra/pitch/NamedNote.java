@@ -24,15 +24,13 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) implem
     @Contract(pure = true)
     @NotNull
     public NamedNote up(@NotNull final Interval interval) {
+        // Absolute carnage
         var newOctave = this.octave + interval.octaves();
         final var newName = Diatonic.byOrdinal(this.name.ordinal() + interval.ordinal() - 1);
         final var expectedOffset = interval.halfsteps();
-        final int actualOffset; {
-            // tfw when you miss let-bindings
-            var offset = newName.halfsteps - this.name.halfsteps;
-            if (offset < 0) newOctave++;
-            actualOffset = offset < 0 ? offset + 12 : offset;
-        }
+        var offset = newName.halfsteps - this.name.halfsteps;
+        if (offset < 0) newOctave++;
+        final var actualOffset = offset < 0 ? offset + 12 : offset;
         final var error = Fraction.of(expectedOffset - actualOffset).add(this.accidental.halfsteps);
 
         // Now we find the correct accidental
@@ -57,11 +55,9 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) implem
         var newOctave = this.octave - interval.octaves();
         final var newName = Diatonic.byOrdinal(this.name.ordinal() - interval.ordinal() + 1);
         final var expectedOffset = interval.halfsteps();
-        final int actualOffset; {
-            var offset = this.name.halfsteps - newName.halfsteps;
-            if (offset < 0) newOctave--;
-            actualOffset = offset < 0 ? offset + 12 : offset;
-        }
+        var offset = this.name.halfsteps - newName.halfsteps;
+        if (offset < 0) newOctave--;
+        final var actualOffset = offset < 0 ? offset + 12 : offset;
         final var error = Fraction.of(expectedOffset - actualOffset).subtract(this.accidental.halfsteps);
 
         // Now we find the correct accidental
@@ -84,11 +80,10 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) implem
      */
     @Contract(pure = true)
     public @NotNull Interval intervalTo(final @NotNull NamedNote other) {
+        // Negative intervals are not a thing
+        if (this.compareTo(other) > 0) return other.intervalTo(this);
         // Count half-steps
         final var targetHalfstepsFraction = halfstepsTo(other);
-        // We don't support negatives
-        if ((targetHalfstepsFraction.compareTo(Fraction.ZERO) < 0) && (other.name != this.name))
-            return other.intervalTo(this);
         if (targetHalfstepsFraction.abs().getDenominator() != 1)
             throw new UnsupportedOperationException("Half-intervals aren't supported");
 
@@ -99,25 +94,23 @@ public record NamedNote(Diatonic name, Accidental accidental, int octave) implem
         if (intervalOrd < 0) intervalOrd += Interval.NUM_INTERVALS;
         intervalOrd++;
 
+        // Find the discriminator
         if (IntervalDiscriminator.PERFECT.isApplicableTo(intervalOrd)) {
-            var interval = new Interval(intervalOrd, IntervalDiscriminator.PERFECT);
-            var error = (targetHalfsteps % 12) - interval.halfsteps();
-            var disc = IntervalDiscriminator.PERFECT;
-            if (error == 1) disc = IntervalDiscriminator.AUGMENTED;
-            else if (error == -1) disc = IntervalDiscriminator.DIMINISHED;
-            else if (error != 0) throw new UnsupportedOperationException();
+            final var interval = new Interval(intervalOrd, IntervalDiscriminator.PERFECT);
+            final var error = (targetHalfsteps % 12) - interval.halfsteps();
 
-            return new Interval(intervalOrd + (Interval.NUM_INTERVALS * (targetHalfsteps / 12)), disc);
+            return new Interval(
+                intervalOrd + (Interval.NUM_INTERVALS * (targetHalfsteps / 12)),
+                IntervalDiscriminator.byHalfstepsFromPerfect(error)
+            );
         } else {
-            var interval = new Interval(intervalOrd, IntervalDiscriminator.MAJOR);
-            var error = (targetHalfsteps % 12) - interval.halfsteps();
-            var disc = IntervalDiscriminator.MAJOR;
-            if (error == 1) disc = IntervalDiscriminator.AUGMENTED;
-            else if (error == -1) disc = IntervalDiscriminator.MINOR;
-            else if (error == -2) disc = IntervalDiscriminator.DIMINISHED;
-            else if (error != 0) throw new UnsupportedOperationException();
+            final var interval = new Interval(intervalOrd, IntervalDiscriminator.MAJOR);
+            final var error = (targetHalfsteps % 12) - interval.halfsteps();
 
-            return new Interval(intervalOrd + (Interval.NUM_INTERVALS * (targetHalfsteps / 12)), disc);
+            return new Interval(
+                intervalOrd + (Interval.NUM_INTERVALS * (targetHalfsteps / 12)),
+                IntervalDiscriminator.byHalfstepsFromMajor(error)
+            );
         }
     }
 

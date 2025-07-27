@@ -94,5 +94,6 @@ public class NamedNoteTest {
         assertEquals(new Interval(4, IntervalDiscriminator.AUGMENTED), NamedNote.of(Diatonic.A, 1).intervalTo(NamedNote.of(Diatonic.E, Accidental.FLAT, 1)));
         assertEquals(new Interval(3, IntervalDiscriminator.MAJOR), NamedNote.of(Diatonic.C, 2).intervalTo(NamedNote.of(Diatonic.A, Accidental.FLAT, 1)));
         assertEquals(new Interval(1, IntervalDiscriminator.DIMINISHED), NamedNote.of(Diatonic.A).intervalTo(NamedNote.of(Diatonic.A, Accidental.FLAT)));
+        assertEquals(new Interval(2, IntervalDiscriminator._DIMINISHED2), NamedNote.of(Diatonic.B, 1).intervalTo(NamedNote.of(Diatonic.C, Accidental.DOUBLE_FLAT, 2)));
     }
 }

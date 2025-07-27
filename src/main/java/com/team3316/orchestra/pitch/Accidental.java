@@ -52,6 +52,12 @@ public enum Accidental {
      */
     SESQUISHARP(Fraction.of(3, 2));
 
+    // Triple flats/sharps (and more) are not supported, and impossible to
+    // support in an enum-based system like this.
+    // NamedNote#up and NamedNote#down aren't total because of this.
+    // TODO: replace this enum-based system with a fraction-based system
+    // (actually really easy to do)
+
     /**
      * Amount of half-steps that this accidental induces over the base note
      * name.

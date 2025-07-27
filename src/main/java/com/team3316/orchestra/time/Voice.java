@@ -162,7 +162,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return New frequency builder
          */
         @Contract(pure = true)
-        public FrequencyBuilder frequencies() {
+        public @NotNull FrequencyBuilder frequencies() {
             return new FrequencyBuilder(notes
                 .stream()
                 .map(p -> Timed.toFrequency(p, sys))
@@ -175,7 +175,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return New pitch builder
          */
         @Contract(pure = true)
-        public Builder pitches() {
+        public @NotNull Builder pitches() {
             return new Builder(notes
                 .stream()
                 .map(p -> Timed.toPitch(p, sys))
@@ -188,7 +188,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return New voice
          */
         @Contract(pure = true)
-        public Voice build() {
+        public @NotNull Voice build() {
             TimedFrequency[] tfs = new TimedFrequency[notes.size()];
             int i = 0;
             for (final var tp : notes) {
@@ -203,7 +203,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @param sys Tuning system
          * @return New builder
          */
-        public static NoteBuilder of(@NotNull List<Timed<NamedNote>> notes, @NotNull TuningSystem sys) {
+        public static @NotNull NoteBuilder of(@NotNull List<Timed<NamedNote>> notes, @NotNull TuningSystem sys) {
             return new NoteBuilder(notes, sys);
         }
 
@@ -213,7 +213,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @param sys Tuning system
          * @return New builder
          */
-        public static NoteBuilder of(@NotNull Timed<NamedNote>[] notes, @NotNull TuningSystem sys) {
+        public static @NotNull NoteBuilder of(@NotNull Timed<NamedNote>[] notes, @NotNull TuningSystem sys) {
             return new NoteBuilder(Arrays.asList(notes), sys);
         }
 
@@ -239,7 +239,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * Create a new builder.
          * @param pitches As in {@link NoteBuilder#NoteBuilder(List, TuningSystem)}
          */
-        public Builder(List<Timed<Pitch>> pitches) {
+        public Builder(@NotNull List<Timed<Pitch>> pitches) {
             this.pitches = new ArrayList<>(pitches);
         }
 
@@ -265,7 +265,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#add(Timed)}
          */
         @Contract(value = "!null->this", mutates="this")
-        public Builder add(Timed<Pitch> pitch) {
+        public Builder add(@NotNull Timed<Pitch> pitch) {
             pitches.add(pitch);
             return this;
         }
@@ -276,7 +276,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#add(Timed[])}
          */
         @Contract(value = "!null->this", mutates="this")
-        public Builder add(Timed<Pitch>[] pitches) {
+        public Builder add(@NotNull Timed<Pitch>[] pitches) {
             this.pitches.addAll(Arrays.asList(pitches));
             return this;
         }
@@ -287,7 +287,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#add(List)}
          */
         @Contract(value = "!null->this", mutates="this")
-        public Builder add(List<Timed<Pitch>> pitches) {
+        public Builder add(@NotNull List<Timed<Pitch>> pitches) {
             this.pitches.addAll(pitches);
             return this;
         }
@@ -299,7 +299,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#scaled(Fraction, Timed)}
          */
         @Contract(value = "!null,!null->this", mutates="this")
-        public Builder scaled(Fraction scalar, Timed<Pitch> pitch) {
+        public Builder scaled(@NotNull Fraction scalar, @NotNull Timed<Pitch> pitch) {
             pitches.add(new Timed<>(pitch.pitch(), pitch.duration().multiply(scalar)));
             return this;
         }
@@ -311,7 +311,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#scaled(Fraction, Timed[])}
          */
         @Contract(value = "!null,!null->this", mutates="this")
-        public Builder scaled(Fraction scalar, Timed<Pitch>[] pitches) {
+        public Builder scaled(@NotNull Fraction scalar, @NotNull Timed<Pitch>[] pitches) {
             this.pitches.addAll(Arrays.stream(pitches).map(p -> new Timed<>(p.pitch(), p.duration().multiply(scalar))).toList());
             return this;
         }
@@ -323,7 +323,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#scaled(Fraction, List)}
          */
         @Contract(value = "!null,!null->this", mutates="this")
-        public Builder scaled(Fraction scalar, List<Timed<Pitch>> pitches) {
+        public Builder scaled(@NotNull Fraction scalar, @NotNull List<Timed<Pitch>> pitches) {
             this.pitches.addAll(pitches.stream().map(p -> new Timed<>(p.pitch(), p.duration().multiply(scalar))).toList());
             return this;
         }
@@ -333,7 +333,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return New builder
          * @see NoteBuilder#frequencies()
          */
-        public FrequencyBuilder frequencies() {
+        public @NotNull FrequencyBuilder frequencies() {
             return new FrequencyBuilder(pitches
                 .stream()
                 .map(Timed::toFrequency)
@@ -346,7 +346,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return New voice
          * @see NoteBuilder#build()
          */
-        public Voice build() {
+        public @NotNull Voice build() {
             TimedFrequency[] tfs = new TimedFrequency[pitches.size()];
             int i = 0;
             for (final var tp : pitches) {
@@ -360,7 +360,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @param pitches As in {@link NoteBuilder#of(List, TuningSystem)}
          * @return As in {@link NoteBuilder#of(List, TuningSystem)}
          */
-        public static Builder of(List<Timed<Pitch>> pitches) {
+        public static @NotNull Builder of(@NotNull List<Timed<Pitch>> pitches) {
             return new Builder(pitches);
         }
 
@@ -369,7 +369,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @param pitches As in {@link NoteBuilder#of(Timed[], TuningSystem)}
          * @return As in {@link NoteBuilder#of(Timed[], TuningSystem)}
          */
-        public static Builder of(Timed<Pitch>[] pitches) {
+        public static @NotNull Builder of(@NotNull Timed<Pitch>[] pitches) {
             return new Builder(Arrays.asList(pitches));
         }
 
@@ -394,7 +394,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * Create a new builder.
          * @param frequencies As in {@link NoteBuilder#NoteBuilder(List, TuningSystem)}
          */
-        public FrequencyBuilder(List<TimedFrequency> frequencies) {
+        public FrequencyBuilder(@NotNull List<TimedFrequency> frequencies) {
             this.frequencies = new ArrayList<>(frequencies);
         }
 
@@ -420,7 +420,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#add(Timed)}
          */
         @Contract(value = "!null->this", mutates="this")
-        public FrequencyBuilder add(TimedFrequency frequency) {
+        public FrequencyBuilder add(@NotNull TimedFrequency frequency) {
             frequencies.add(frequency);
             return this;
         }
@@ -431,7 +431,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#add(Timed[])}
          */
         @Contract(value = "!null->this", mutates="this")
-        public FrequencyBuilder add(TimedFrequency[] frequencies) {
+        public FrequencyBuilder add(@NotNull TimedFrequency[] frequencies) {
             this.frequencies.addAll(Arrays.asList(frequencies));
             return this;
         }
@@ -442,7 +442,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#add(List)}
          */
         @Contract(value = "!null->this", mutates="this")
-        public FrequencyBuilder add(List<TimedFrequency> frequencies) {
+        public FrequencyBuilder add(@NotNull List<TimedFrequency> frequencies) {
             this.frequencies.addAll(frequencies);
             return this;
         }
@@ -454,7 +454,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#scaled(Fraction, Timed)}
          */
         @Contract(value = "!null,!null->this", mutates="this")
-        public FrequencyBuilder scaled(Fraction scalar, TimedFrequency frequency) {
+        public FrequencyBuilder scaled(@NotNull Fraction scalar, @NotNull TimedFrequency frequency) {
             frequencies.add(new TimedFrequency(frequency.frequency(), frequency.duration().multiply(scalar)));
             return this;
         }
@@ -466,7 +466,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#scaled(Fraction, Timed[])}
          */
         @Contract(value = "!null,!null->this", mutates="this")
-        public FrequencyBuilder scaled(Fraction scalar, TimedFrequency[] frequencies) {
+        public FrequencyBuilder scaled(@NotNull Fraction scalar, @NotNull TimedFrequency[] frequencies) {
             this.frequencies.addAll(Arrays.stream(frequencies).map(p -> new TimedFrequency(p.frequency(), p.duration().multiply(scalar))).toList());
             return this;
         }
@@ -478,7 +478,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @return As in {@link NoteBuilder#scaled(Fraction, List)}
          */
         @Contract(value = "!null,!null->this", mutates="this")
-        public FrequencyBuilder scaled(Fraction scalar, List<TimedFrequency> frequencies) {
+        public FrequencyBuilder scaled(@NotNull Fraction scalar, @NotNull List<TimedFrequency> frequencies) {
             this.frequencies.addAll(frequencies.stream().map(p -> new TimedFrequency(p.frequency(), p.duration().multiply(scalar))).toList());
             return this;
         }
@@ -487,7 +487,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * Build a voice.
          * @return New voice
          */
-        public Voice build() {
+        public @NotNull Voice build() {
             return new Voice(frequencies.toArray(TF_ARRAY));
         }
 
@@ -496,7 +496,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @param frequencies As in {@link NoteBuilder#of(List, TuningSystem)}
          * @return As in {@link NoteBuilder#of(List, TuningSystem)}
          */
-        public static FrequencyBuilder of(List<TimedFrequency> frequencies) {
+        public static @NotNull FrequencyBuilder of(@NotNull List<TimedFrequency> frequencies) {
             return new FrequencyBuilder(frequencies);
         }
 
@@ -505,7 +505,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements Supplier<V
          * @param frequencies As in {@link NoteBuilder#of(Timed[], TuningSystem)}
          * @return As in {@link NoteBuilder#of(Timed[], TuningSystem)}
          */
-        public static FrequencyBuilder of(TimedFrequency[] frequencies) {
+        public static @NotNull FrequencyBuilder of(@NotNull TimedFrequency[] frequencies) {
             return new FrequencyBuilder(Arrays.asList(frequencies));
         }
 

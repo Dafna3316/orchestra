@@ -1,5 +1,7 @@
 package com.team3316.orchestra.pitch;
 
+import java.io.Serializable;
+
 import org.apache.commons.numbers.fraction.Fraction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +16,7 @@ import com.team3316.orchestra.tuning.TuningSystem;
  * This doesn't store any frequencies, only an abstract pitch which is to be
  * interpreted by a {@link TuningSystem}.
  */
-public record NamedNote(Diatonic name, Accidental accidental, int octave) implements Comparable<NamedNote> {
+public record NamedNote(Diatonic name, Accidental accidental, int octave) implements Comparable<NamedNote>, Serializable {
     /**
      * Transpose this note up by a given interval.
      * 

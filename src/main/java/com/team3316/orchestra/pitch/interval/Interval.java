@@ -1,5 +1,7 @@
 package com.team3316.orchestra.pitch.interval;
 
+import java.io.Serializable;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -8,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * @param ordinal The name of the interval (positive, 1 for unison)
  * @param discriminator The kind of interval
  */
-public record Interval(int ordinal, @NotNull IntervalDiscriminator discriminator) {
+public record Interval(int ordinal, @NotNull IntervalDiscriminator discriminator) implements Serializable {
     public Interval {
         if (ordinal < 1)
             throw new IllegalArgumentException("Non-positive ordinal: " + ordinal);

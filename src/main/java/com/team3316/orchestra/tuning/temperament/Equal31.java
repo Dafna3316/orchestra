@@ -10,35 +10,19 @@ import com.team3316.orchestra.pitch.NamedNote;
 import com.team3316.orchestra.pitch.Pitch;
 import com.team3316.orchestra.pitch.interval.Interval;
 import com.team3316.orchestra.pitch.interval.IntervalDiscriminator;
-import com.team3316.orchestra.tuning.ContextlessIntervalInterpreter;
-import com.team3316.orchestra.tuning.TuningSystem;
+import com.team3316.orchestra.tuning.EqualTemperament;
 
 /**
  * 31-tone equal temperament.
  * @param referenceNote Reference note
  * @param referencePitch Pitch correspondign to reference note
  */
-public record Equal31(NamedNote referenceNote, Pitch referencePitch) implements TuningSystem, ContextlessIntervalInterpreter, Serializable {
+public record Equal31(NamedNote referenceNote, Pitch referencePitch) implements EqualTemperament, Serializable {
     private static final Fraction DIESIS_TO_SEMITONE = Fraction.of(12, 31);
 
     @Override
-    public @NotNull Pitch upInterval(@NotNull Pitch original, @NotNull Interval interval) {
-        return original.upSemis(DIESIS_TO_SEMITONE.multiply(diesesOf(interval)));
-    }
-
-    @Override
-    public @NotNull Pitch downInterval(@NotNull Pitch original, @NotNull Interval interval) {
-        return original.downSemis(DIESIS_TO_SEMITONE.multiply(diesesOf(interval)));
-    }
-
-    @Override
-    public @NotNull Pitch interpret(@NotNull NamedNote note) {
-        // Very lazy, but it works
-        return referencePitch.upSemis(
-            DIESIS_TO_SEMITONE
-                .multiply(diesesOf(referenceNote.intervalTo(note)))
-                .multiply(note.compareTo(referenceNote) < 0 ? -1 : 1)
-        );
+    public @NotNull Fraction semitonesOf(Interval interval) {
+        return DIESIS_TO_SEMITONE.multiply(diesesOf(interval));
     }
 
     private static int diesesOf(Interval interval) {
@@ -60,35 +44,12 @@ public record Equal31(NamedNote referenceNote, Pitch referencePitch) implements 
     }
 
     private static int perfectDelta(IntervalDiscriminator disc) {
-        return switch (disc) {
-            case PERFECT -> 0;
-            case AUGMENTED -> 2;
-            case DIMINISHED -> -2;
-            case _AUGMENTED2 -> 4;
-            case _AUGMENTED3 -> 6;
-            case _AUGMENTED4 -> 8;
-            case _DIMINISHED2 -> -4;
-            case _DIMINISHED3 -> -6;
-            case _DIMINISHED4 -> -8;
-            case MAJOR, MINOR -> throw new IllegalArgumentException("Imperfect discriminator passed to perfect");
-        };
+        return disc.halfstepsFromPerfect() * 2;
     }
 
     // Relative to major
     private static int imperfectDelta(IntervalDiscriminator disc) {
-        return switch (disc) {
-            case MAJOR -> 0;
-            case MINOR -> -2;
-            case AUGMENTED -> 2;
-            case DIMINISHED -> -4;
-            case _AUGMENTED2 -> 4;
-            case _AUGMENTED3 -> 6;
-            case _AUGMENTED4 -> 8;
-            case _DIMINISHED2 -> -6;
-            case _DIMINISHED3 -> -8;
-            case _DIMINISHED4 -> -10;
-            case PERFECT -> throw new IllegalArgumentException("Perfect discriminator passed to imperfect");
-        };
+        return disc.halfstepsFromMajor() * 2;
     }
 
     /**

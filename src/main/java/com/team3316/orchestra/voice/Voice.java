@@ -24,8 +24,8 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
      * Create a voice builder.
      * @return New builder
      */
-    public static @NotNull Builder builder() {
-        return new Builder();
+    public static @NotNull PitchBuilder builder() {
+        return new PitchBuilder();
     }
 
     /**
@@ -33,8 +33,8 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
      * @param capacity Initial capacity
      * @return New builder
      */
-    public static @NotNull Builder builder(int capacity) {
-        return new Builder(capacity);
+    public static @NotNull PitchBuilder builder(int capacity) {
+        return new PitchBuilder(capacity);
     }
 
     @Override
@@ -172,12 +172,12 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
         }
 
         /**
-         * Convert to a pitch {@link Builder}.
+         * Convert to a pitch {@link PitchBuilder}.
          * @return New pitch builder
          */
         @Contract(pure = true)
-        public @NotNull Builder pitches() {
-            return new Builder(notes
+        public @NotNull PitchBuilder pitches() {
+            return new PitchBuilder(notes
                 .stream()
                 .map(p -> Timed.toPitch(p, sys))
                 .collect(Collectors.toCollection(() -> new ArrayList<>(notes.size())))
@@ -236,10 +236,10 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
      * Builder that accumulates {@link Pitch}es.
      * @see NoteBuilder
      */
-    public static final class Builder implements VoiceSupplier {
+    public static final class PitchBuilder implements VoiceSupplier {
         private ArrayList<Timed<Pitch>> pitches;
 
-        Builder(ArrayList<Timed<Pitch>> pitches) {
+        PitchBuilder(ArrayList<Timed<Pitch>> pitches) {
             this.pitches = pitches;
         }
 
@@ -247,7 +247,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * Create a new builder.
          * @param pitches As in {@link NoteBuilder#NoteBuilder(List, TuningSystem)}
          */
-        public Builder(@NotNull List<Timed<Pitch>> pitches) {
+        public PitchBuilder(@NotNull List<Timed<Pitch>> pitches) {
             this.pitches = new ArrayList<>(pitches);
         }
 
@@ -255,7 +255,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * Create a new builder.
          * @param capacity As in {@link NoteBuilder#NoteBuilder(int, TuningSystem)}
          */
-        public Builder(int capacity) {
+        public PitchBuilder(int capacity) {
             this.pitches = new ArrayList<>(capacity);
         }
 
@@ -263,7 +263,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * Create a new builder.
          * @see NoteBuilder#NoteBuilder(TuningSystem)
          */
-        public Builder() {
+        public PitchBuilder() {
             this.pitches = new ArrayList<>();
         }
 
@@ -273,7 +273,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * @return As in {@link NoteBuilder#add(Timed)}
          */
         @Contract(value = "!null->this", mutates="this")
-        public Builder add(@NotNull Timed<Pitch> pitch) {
+        public PitchBuilder add(@NotNull Timed<Pitch> pitch) {
             pitches.add(pitch);
             return this;
         }
@@ -284,7 +284,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * @return As in {@link NoteBuilder#add(Timed[])}
          */
         @Contract(value = "!null->this", mutates="this")
-        public Builder add(@NotNull Timed<Pitch>[] pitches) {
+        public PitchBuilder add(@NotNull Timed<Pitch>[] pitches) {
             this.pitches.addAll(Arrays.asList(pitches));
             return this;
         }
@@ -295,7 +295,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * @return As in {@link NoteBuilder#add(List)}
          */
         @Contract(value = "!null->this", mutates="this")
-        public Builder add(@NotNull List<Timed<Pitch>> pitches) {
+        public PitchBuilder add(@NotNull List<Timed<Pitch>> pitches) {
             this.pitches.addAll(pitches);
             return this;
         }
@@ -307,7 +307,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * @return As in {@link NoteBuilder#scaled(Fraction, Timed)}
          */
         @Contract(value = "!null,!null->this", mutates="this")
-        public Builder scaled(@NotNull Fraction scalar, @NotNull Timed<Pitch> pitch) {
+        public PitchBuilder scaled(@NotNull Fraction scalar, @NotNull Timed<Pitch> pitch) {
             pitches.add(Timed.of(pitch.pitch(), pitch.duration().multiply(scalar)));
             return this;
         }
@@ -319,7 +319,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * @return As in {@link NoteBuilder#scaled(Fraction, Timed[])}
          */
         @Contract(value = "!null,!null->this", mutates="this")
-        public Builder scaled(@NotNull Fraction scalar, @NotNull Timed<Pitch>[] pitches) {
+        public PitchBuilder scaled(@NotNull Fraction scalar, @NotNull Timed<Pitch>[] pitches) {
             this.pitches.addAll(Arrays.stream(pitches).map(p -> Timed.of(p.pitch(), p.duration().multiply(scalar))).toList());
             return this;
         }
@@ -331,7 +331,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * @return As in {@link NoteBuilder#scaled(Fraction, List)}
          */
         @Contract(value = "!null,!null->this", mutates="this")
-        public Builder scaled(@NotNull Fraction scalar, @NotNull List<Timed<Pitch>> pitches) {
+        public PitchBuilder scaled(@NotNull Fraction scalar, @NotNull List<Timed<Pitch>> pitches) {
             this.pitches.addAll(pitches.stream().map(p -> Timed.of(p.pitch(), p.duration().multiply(scalar))).toList());
             return this;
         }
@@ -365,7 +365,7 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof Builder b) {
+            if (obj instanceof PitchBuilder b) {
                 return b.pitches.equals(this.pitches);
             } else return false;
         }
@@ -375,8 +375,8 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * @param pitches As in {@link NoteBuilder#of(List, TuningSystem)}
          * @return As in {@link NoteBuilder#of(List, TuningSystem)}
          */
-        public static @NotNull Builder of(@NotNull List<Timed<Pitch>> pitches) {
-            return new Builder(pitches);
+        public static @NotNull PitchBuilder of(@NotNull List<Timed<Pitch>> pitches) {
+            return new PitchBuilder(pitches);
         }
 
         /**
@@ -384,8 +384,8 @@ public record Voice(@NotNull TimedFrequency[] frequencies) implements VoiceSuppl
          * @param pitches As in {@link NoteBuilder#of(Timed[], TuningSystem)}
          * @return As in {@link NoteBuilder#of(Timed[], TuningSystem)}
          */
-        public static @NotNull Builder of(@NotNull Timed<Pitch>[] pitches) {
-            return new Builder(Arrays.asList(pitches));
+        public static @NotNull PitchBuilder of(@NotNull Timed<Pitch>[] pitches) {
+            return new PitchBuilder(Arrays.asList(pitches));
         }
 
         @Override

@@ -55,4 +55,16 @@ public interface WellTemperament extends TuningSystem {
         final var basePitch = byHalfsteps(referencePitch(), targetHalfsteps);
         return basePitch.upRatio(Fraction.of(2).pow(octaves));
     }
+
+    /**
+     * Thrown when an invalid half-step index is passed.
+     */
+    public static class IllegalHalfstepException extends IllegalArgumentException {
+        /**
+         * Default constructor.
+         */
+        public IllegalHalfstepException() {
+            super("Half-step not between 0 and 12");
+        }
+    }
 }

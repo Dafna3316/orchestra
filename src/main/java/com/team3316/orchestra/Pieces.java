@@ -656,7 +656,7 @@ public final class Pieces {
             Timed.of(NamedNote.of(B, FLAT, 1), Fraction.of(1, 2)),
 
             Timed.of(NamedNote.of(G, 1), Fraction.of(3, 4))
-        ), new Equal24()).pitches()
+        ), new Equal24())
     ));
 
     private Pieces() {}

@@ -24,6 +24,7 @@ import com.team3316.orchestra.pitch.NamedNote;
 import com.team3316.orchestra.time.Tempo;
 import com.team3316.orchestra.time.Timed;
 import com.team3316.orchestra.tuning.TuningSystem;
+import com.team3316.orchestra.tuning.WellTemperament;
 import com.team3316.orchestra.tuning.temperament.Equal24;
 import com.team3316.orchestra.voice.Voice;
 
@@ -31,7 +32,7 @@ import com.team3316.orchestra.voice.Voice;
  * Utility class for creating pieces out of MIDI files.
  */
 public final class MidiInput {
-    private static final TuningSystem DEFAULT_TUNING_SYSTEM = new Equal24();
+    private static final WellTemperament DEFAULT_TUNING_SYSTEM = new Equal24();
     private static final Fraction QUARTER = Fraction.of(1, 4);
 
     // This is not a declared constant in MetaMessage
@@ -179,16 +180,14 @@ public final class MidiInput {
     }
 
     /**
-     * Read a piece from a MIDI file and tune it using the given {@link TuningSystem}.
-     * <p>
-     * The tuning system should be 12-tone (such as 12TET or Kirnberger III), since MIDI only has 12 keys.
+     * Read a piece from a MIDI file and tune it using the given {@link WellTemperament}.
      * @param name File name
      * @param sys Tuning system (12-tone)
      * @return The piece (if successful)
      * @throws InvalidMidiDataException See {@link MidiSystem#getSequence(File)}
      * @throws IOException See {@link MidiSystem#getSequence(File)}
      */
-    public static Piece open(String name, TuningSystem sys) throws InvalidMidiDataException, IOException {
+    public static Piece open(String name, WellTemperament sys) throws InvalidMidiDataException, IOException {
         return fromSequence(MidiSystem.getSequence(new File(name)), sys);
     }
 
@@ -204,16 +203,14 @@ public final class MidiInput {
     }
 
     /**
-     * Read a piece from a MIDI file and tune it using the given {@link TuningSystem}.
-     * <p>
-     * The tuning system should be 12-tone (such as 12TET or Kirnberger III), since MIDI only has 12 keys.
+     * Read a piece from a MIDI file and tune it using the given {@link WellTemperament}.
      * @param file File pointer
      * @param sys Tuning system (12-tone)
      * @return The piece (if successful)
      * @throws InvalidMidiDataException See {@link MidiSystem#getSequence(File)}
      * @throws IOException See {@link MidiSystem#getSequence(File)}
      */
-    public static Piece open(File file, TuningSystem sys) throws InvalidMidiDataException, IOException {
+    public static Piece open(File file, WellTemperament sys) throws InvalidMidiDataException, IOException {
         return fromSequence(MidiSystem.getSequence(file), sys);
     }
 
@@ -229,16 +226,14 @@ public final class MidiInput {
     }
 
     /**
-     * Read a piece from a MIDI file over URL and tune it using the given {@link TuningSystem}.
-     * <p>
-     * The tuning system should be 12-tone (such as 12TET or Kirnberger III), since MIDI only has 12 keys.
+     * Read a piece from a MIDI file over URL and tune it using the given {@link WellTemperament}.
      * @param url URL
      * @param sys Tuning system (12-tone)
      * @return The piece (if successful)
      * @throws InvalidMidiDataException See {@link MidiSystem#getSequence(File)}
      * @throws IOException See {@link MidiSystem#getSequence(File)}
      */
-    public static Piece open(URL url, TuningSystem sys) throws InvalidMidiDataException, IOException {
+    public static Piece open(URL url, WellTemperament sys) throws InvalidMidiDataException, IOException {
         return fromSequence(MidiSystem.getSequence(url), sys);
     }
 
@@ -254,16 +249,14 @@ public final class MidiInput {
     }
 
     /**
-     * Read a piece from an input stream and tune it using the given {@link TuningSystem}.
-     * <p>
-     * The tuning system should be 12-tone (such as 12TET or Kirnberger III), since MIDI only has 12 keys.
+     * Read a piece from an input stream and tune it using the given {@link WellTemperament}.
      * @param stream Input stream
      * @param sys Tuning system (12-tone)
      * @return The piece (if successful)
      * @throws InvalidMidiDataException See {@link MidiSystem#getSequence(File)}
      * @throws IOException See {@link MidiSystem#getSequence(File)}
      */
-    public static Piece open(InputStream stream, TuningSystem sys) throws InvalidMidiDataException, IOException {
+    public static Piece open(InputStream stream, WellTemperament sys) throws InvalidMidiDataException, IOException {
         return fromSequence(MidiSystem.getSequence(stream), sys);
     }
 

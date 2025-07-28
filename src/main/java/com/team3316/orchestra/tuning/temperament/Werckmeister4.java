@@ -13,7 +13,7 @@ import com.team3316.orchestra.tuning.WellTemperament;
  * Werckmeister IV temperament.
  * @param referenceNote Base note name of the system
  * @param referencePitch Pitch that the base note should be mapped to
- * @see <a href="https://en.wikipedia.org/wiki/Werckmeister_temperament#Werckmeister_II_(IV):_another_temperament_included_in_the_Orgelprobe,_divided_up_through_⁠1/3⁠_comma>Wikipedia</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Werckmeister_temperament#Werckmeister_II_(IV):_another_temperament_included_in_the_Orgelprobe,_divided_up_through_1%2F3_comma">Wikipedia</a>
  */
 public record Werckmeister4(NamedNote referenceNote, Pitch referencePitch) implements WellTemperament, Serializable {
     @Override

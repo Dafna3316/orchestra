@@ -13,7 +13,7 @@ import com.team3316.orchestra.tuning.WellTemperament;
  * Werckmeister VI temperament.
  * @param referenceNote Base note name of the system
  * @param referencePitch Pitch that the base note should be mapped to
- * @see <a href="https://en.wikipedia.org/wiki/Werckmeister_temperament#Werckmeister_IV_(VI):_the_Septenarius_tunings>Wikipedia</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Werckmeister_temperament#Werckmeister_IV_(VI):_the_Septenarius_tunings">Wikipedia</a>
  */
 public record Werckmeister6(NamedNote referenceNote, Pitch referencePitch) implements WellTemperament, Serializable {
     @Override

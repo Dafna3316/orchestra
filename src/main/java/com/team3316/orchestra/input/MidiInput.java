@@ -68,7 +68,7 @@ public final class MidiInput {
         for (final var track : sequence.getTracks()) {
             final var builder = new Voice.NoteBuilder(sys);
             var inNote = false;
-            NamedNote note = null; // note name preserved across inner iterations
+            var key = 0;
             long lastEvent = 0; // tick of last event
 
             // Iterate over events in the track
@@ -91,8 +91,13 @@ public final class MidiInput {
                             continue;
                         }
 
+                        if (sm.getData1() != key) {
+                            System.err.println("NOTE_OFF for different key");
+                            continue;
+                        }
+
                         inNote = false;
-                        builder.add(Timed.of(note, tick.multiply((int) (event.getTick() - lastEvent))));
+                        builder.add(Timed.of(decipherKey(key), tick.multiply((int) (event.getTick() - lastEvent))));
                         lastEvent = event.getTick();
                     } else if (sm.getCommand() == ShortMessage.NOTE_ON) {
                         if (inNote) {
@@ -105,7 +110,7 @@ public final class MidiInput {
                         if (lastEvent > 0 && lastEvent < event.getTick())
                             builder.add(Timed.rest(tick.multiply((int) (event.getTick() - lastEvent))));
                         lastEvent = event.getTick();
-                        note = decipherKey(sm.getData1());
+                        key = sm.getData1();
                     }
                 }
             }

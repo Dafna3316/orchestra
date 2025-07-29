@@ -7,7 +7,8 @@ import org.apache.commons.numbers.fraction.Fraction;
 import com.team3316.orchestra.pitch.NamedNote;
 import com.team3316.orchestra.time.Tempo;
 import com.team3316.orchestra.time.Timed;
-import com.team3316.orchestra.tuning.temperament.Equal24;
+import com.team3316.orchestra.tuning.TuningSystem;
+import com.team3316.orchestra.tuning.temperament.Equal31;
 import com.team3316.orchestra.voice.Voice;
 
 import static com.team3316.orchestra.pitch.Diatonic.A;
@@ -25,6 +26,7 @@ import static com.team3316.orchestra.pitch.Accidental.FLAT;
  * A collection of built-in pieces
  */
 public final class Pieces {
+    private static final TuningSystem sys = new Equal31();
     /**
      * כשאור דולק בחלונך
      */
@@ -179,7 +181,8 @@ public final class Pieces {
             Timed.of(NamedNote.of(D, 2), Fraction.of(1, 8)),
 
             Timed.of(NamedNote.of(F, 2), Fraction.of(6, 8))
-        ), new Equal24()).pitches(),
+        ), sys),
+
         Voice.NoteBuilder.of(List.of(
             Timed.rest(Fraction.of(1, 4)),
 
@@ -199,7 +202,7 @@ public final class Pieces {
 
             Timed.of(NamedNote.of(F, 1), Fraction.of(1, 8)),
             Timed.of(NamedNote.of(E, 1), Fraction.of(1, 8)),
-            Timed.of(NamedNote.of(F, 1), Fraction.of(7, 8)),
+            Timed.of(NamedNote.of(F, 1), Fraction.of(5, 8)),
             Timed.of(NamedNote.of(E, 1), Fraction.of(1, 8)),
             Timed.of(NamedNote.of(F, 1), Fraction.of(1, 2)),
 
@@ -229,7 +232,7 @@ public final class Pieces {
 
             Timed.of(NamedNote.of(B, FLAT, 1), Fraction.of(1, 8)),
             Timed.of(NamedNote.of(A, 1), Fraction.of(1, 8)),
-            Timed.of(NamedNote.of(B, FLAT, 1), Fraction.of(7, 8)),
+            Timed.of(NamedNote.of(B, FLAT, 1), Fraction.of(5, 8)),
             Timed.of(NamedNote.of(A, 1), Fraction.of(1, 8)),
             Timed.of(NamedNote.of(B, FLAT, 1), Fraction.of(1, 2)),
 
@@ -325,7 +328,8 @@ public final class Pieces {
             Timed.of(NamedNote.of(D, 1), Fraction.of(1, 8)),
 
             Timed.of(NamedNote.of(C, SHARP, 1), Fraction.of(3, 4))
-        ), new Equal24()).pitches(),
+        ), sys),
+
         new Voice.NoteBuilder(List.of(
             Timed.rest(Fraction.of(1, 4)),
             Timed.of(NamedNote.of(B, FLAT, 1), Fraction.of(3, 4)),
@@ -480,7 +484,7 @@ public final class Pieces {
             Timed.of(NamedNote.of(D, 2), Fraction.of(1, 2)),
 
             Timed.of(NamedNote.of(B, FLAT, 1), Fraction.of(3, 4))
-        ), new Equal24()).pitches(),
+        ), sys),
 
         new Voice.NoteBuilder(List.of(
             Timed.of(NamedNote.of(D, 1), Fraction.of(1, 4)),
@@ -656,7 +660,7 @@ public final class Pieces {
             Timed.of(NamedNote.of(B, FLAT, 1), Fraction.of(1, 2)),
 
             Timed.of(NamedNote.of(G, 1), Fraction.of(3, 4))
-        ), new Equal24())
+        ), sys)
     ));
 
     private Pieces() {}

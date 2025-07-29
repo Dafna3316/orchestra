@@ -107,7 +107,7 @@ public final class MidiInput {
 
                         inNote = true;
                         // The time between NOTE_OFF and NOTE_ON is a rest
-                        if (lastEvent > 0 && lastEvent < event.getTick())
+                        if (lastEvent < event.getTick())
                             builder.add(Timed.rest(tick.multiply((int) (event.getTick() - lastEvent))));
                         lastEvent = event.getTick();
                         key = sm.getData1();

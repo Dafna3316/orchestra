@@ -19,7 +19,7 @@ tuningDecl : '\\tuning' STRING namedNote pitch ;
 voices : voice ('\\\\' voice)* ;
 voice : music ;
 
-music : relativeMusic | seqMusic | seqMusic | musicAtom;
+music : relativeMusic | fixedMusic | seqMusic | musicAtom;
 relativeMusic : '\\relative' music | '\\relative' namedNote music ;
 fixedMusic : '\\fixed' music | '\\fixed' namedNote music;
 seqMusic : '{' music* '}';

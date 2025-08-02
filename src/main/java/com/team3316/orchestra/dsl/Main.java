@@ -11,7 +11,8 @@ import com.team3316.orchestra.Piece;
 import com.team3316.orchestra.antlr.PieceLexer;
 import com.team3316.orchestra.antlr.PieceParser;
 
-public class Main {
+// Simple wrapper around the lexer & parser
+class Main {
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             outputPiece(new PieceLexer(CharStreams.fromStream(System.in)), new ObjectOutputStream(System.out));
@@ -27,7 +28,7 @@ public class Main {
         var tokens = new CommonTokenStream(in);
         var parser = new PieceParser(tokens);
         var piece = parser.piece().accept(new PieceBuildVisitor());
-        if (piece instanceof Piece p) {
+        if (piece instanceof Piece p) { // it better be
             out.writeObject(p);
             out.close();
         } else {

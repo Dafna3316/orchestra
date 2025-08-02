@@ -64,6 +64,10 @@ tasks.named("sourcesJar") {
     dependsOn(tasks.generateGrammarSource)
 }
 
+tasks.javadoc {
+    exclude("com/team3316/orchestra/antlr/**")
+}
+
 tasks.named<Test>("test") {
     useJUnitPlatform()
 

@@ -35,9 +35,12 @@ import com.team3316.orchestra.tuning.TuningSystem;
 import com.team3316.orchestra.voice.Voice;
 import com.team3316.orchestra.voice.VoiceSupplier;
 
-public class PieceBuildVisitor extends PieceBaseVisitor<Object> {
+// Surprisingly not that long
+class PieceBuildVisitor extends PieceBaseVisitor<Object> {
+    // The only final field, unfortunately
     private static final Map<String, Pair<Diatonic, Accidental>> names;
 
+    // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     private static void addNote(Map<String, Pair<Diatonic, Accidental>> map, String baseName, Diatonic note, boolean contract) {
         map.put(baseName, new Pair<>(note, Accidental.NATURAL));
         map.put(baseName + "es", new Pair<>(note, Accidental.FLAT));
@@ -57,6 +60,7 @@ public class PieceBuildVisitor extends PieceBaseVisitor<Object> {
         }
     }
 
+    // static initializer!
     static {
         var map = new HashMap<String, Pair<Diatonic, Accidental>>(7 * 9);
         addNote(map, "c", Diatonic.C, false);
@@ -69,37 +73,44 @@ public class PieceBuildVisitor extends PieceBaseVisitor<Object> {
         names = Collections.unmodifiableMap(map);
     }
 
+    // STATE
     private TuningSystem sys = null;
     private Tempo tempo = new Tempo(Fraction.of(1, 4), Tempo.BPM.of(120));
     private ArrayList<VoiceSupplier> voices = new ArrayList<>();
-    private boolean relativeMode = false;
-    private NamedNote relativeNote = null;
-    private Fraction lastDur = Fraction.of(1, 4);
-    private int fixedOctave = 0;
-    private Supplier<VoiceSupplier> newForStorage = () -> new Voice.NoteBuilder(sys);
+    private boolean relativeMode = false; // Are we currently in relative mode?
+    private NamedNote relativeNote = null; // Previous note for relative mode
+    private Fraction lastDur = Fraction.of(1, 4); // Duration of last note
+    private int fixedOctave = 0; // Octave for fixed mode
+    private Supplier<VoiceSupplier> newForStorage = () -> new Voice.NoteBuilder(sys); // Very hacky
 
     @Override
     public Piece visitPiece(PieceContext ctx) {
         super.visitPiece(ctx);
+        // dead simple
         return new Piece(tempo, voices);
     }
 
     public Void visitTuningDecl(TuningDeclContext ctx) {
         var stringLiteral = ctx.STRING().getText();
+        // yes this is how I get the contents of the string
         var sys = TuningRegistry.lookup(stringLiteral.substring(1, stringLiteral.length() - 1));
         if (sys == null) {
+            // 🪞
             try {
                 Class<?> clazz = Class.forName(ctx.STRING().getText());
                 if (TuningSystem.class.isAssignableFrom(clazz)) {
-                    this.sys = (TuningSystem) clazz.getConstructor(NamedNote.class, Pitch.class)
-                            .newInstance(visitNamedNote(ctx.namedNote()), visitPitch(ctx.pitch()));
+                    this.sys = (TuningSystem)
+                        (clazz.getConstructor(NamedNote.class, Pitch.class)
+                            .newInstance(visitNamedNote(ctx.namedNote()), visitPitch(ctx.pitch())));
                 }
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                // the safest
                 e.printStackTrace();
                 this.sys = null;
             }
         } else {
+            // please register your tuning systems so I don't have to reflect :(
             this.sys = sys.construct(visitNamedNote(ctx.namedNote()), visitPitch(ctx.pitch()));
         }
 
@@ -108,6 +119,7 @@ public class PieceBuildVisitor extends PieceBaseVisitor<Object> {
 
     @Override
     public Void visitStorageDecl(StorageDeclContext ctx) {
+        // hacky hack
         if (ctx.storage().NOTE_STORAGE() != null)
             newForStorage = () -> new Voice.NoteBuilder(sys);
         else if (ctx.storage().PITCH_STORAGE() != null)
@@ -138,6 +150,7 @@ public class PieceBuildVisitor extends PieceBaseVisitor<Object> {
     @Override
     public Object visitVoice(VoiceContext ctx) {
         voices.add(newForStorage.get());
+        // Cleanup after previous voice
         relativeMode = false;
         fixedOctave = 0;
         return super.visitVoice(ctx);
@@ -146,6 +159,7 @@ public class PieceBuildVisitor extends PieceBaseVisitor<Object> {
     @Override
     public Object visitRelativeMusic(RelativeMusicContext ctx) {
         relativeMode = true;
+
         if (ctx.namedNote() != null) {
             relativeNote = visitNamedNote(ctx.namedNote());
         } else {
@@ -158,6 +172,7 @@ public class PieceBuildVisitor extends PieceBaseVisitor<Object> {
     @Override
     public Object visitFixedMusic(FixedMusicContext ctx) {
         relativeMode = false;
+
         if (ctx.namedNote() != null) {
             fixedOctave = ctx.namedNote().octave().result;
         } else {
@@ -191,17 +206,21 @@ public class PieceBuildVisitor extends PieceBaseVisitor<Object> {
 
     @Override
     public Void visitTimedNN(TimedNNContext ctx) {
+        // Obtain the note and duration separately
         var dur = ctx.dur() == null ? lastDur : visitDur(ctx.dur());
         var raw = visitNamedNote(ctx.namedNote());
         var newOctave = raw.octave();
         if (relativeMode && relativeNote != null) {
+            // The difference is the poor man's interval
             var diff = raw.name().ordinal() - relativeNote.name().ordinal();
             newOctave += relativeNote.octave();
-            if (Math.abs(diff) >= 4) {
+            if (Math.abs(diff) >= 4) { // Wider than a fifth (4)
+                // Surely there's a better way to do this
                 if (diff > 0) newOctave--;
                 else newOctave++;
             }
         } else {
+            // Fixed mode is the easiest!
             newOctave += fixedOctave;
         }
 

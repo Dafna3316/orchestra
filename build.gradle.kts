@@ -60,3 +60,13 @@ tasks.named<Test>("test") {
         events("skipped", "passed", "failed")
     }
 }
+
+tasks.register<Exec>("jshell") {
+    dependsOn(tasks.classes)
+    val path = sourceSets["main"].runtimeClasspath.filter { it.exists() }.map { it.toString() }.joinToString(separator = System.getProperty("path.separator"))
+    logger.info(":jshell executing with --class-path {}", path)
+    val shellArgs = listOf("-a", "jshell", "--class-path", path, "--startup", "DEFAULT", "--startup", "PRINTING")
+    standardInput = System.`in`
+    executable("rlwrap")
+    args(shellArgs)
+}

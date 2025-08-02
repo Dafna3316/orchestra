@@ -7,6 +7,7 @@
 
 plugins {
     `java-library`
+    antlr
     id("edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin") version "2025.0"
 }
 
@@ -28,6 +29,7 @@ dependencies {
     api("org.apache.commons", "commons-numbers-fraction", "1.2")
     implementation("org.apache.commons", "commons-lang3", "3.18.0")
     compileOnly("org.jetbrains", "annotations", "26.0.2")
+    antlr("org.antlr", "antlr4", "4.13.2")
 
     implementation("edu.wpi.first.wpilibj", "wpilibj-java", wpilibVersion)
     api("edu.wpi.first.wpilibNewCommands", "wpilibNewCommands-java", wpilibVersion)
@@ -51,6 +53,14 @@ java {
 
     withSourcesJar()
     withJavadocJar()
+}
+
+tasks.generateGrammarSource {
+    arguments = arguments + listOf("-visitor")
+}
+
+tasks.named("sourcesJar") {
+    dependsOn(tasks.generateGrammarSource)
 }
 
 tasks.named<Test>("test") {

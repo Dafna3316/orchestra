@@ -35,10 +35,10 @@ public class PiecesTest {
     }
 
     public static void logPiece(Piece piece) {
-        System.out.println("===PIECE===");
+        System.out.println("=== PIECE ===");
         System.out.println("Tempo: " + piece.tempo().duration() + " = " + piece.tempo().frequency().multiply(60));
         for (final var voice : piece.voices()) {
-            System.out.println("===VOICE===");
+            System.out.println("=== VOICE (" + voice.getClass().getSimpleName() + ") ===");
             for (final var freq : voice.get().frequencies()) {
                 System.out.printf("%d/%d: %f\n", freq.duration().getNumerator(), freq.duration().getDenominator(), freq.frequency());
             }

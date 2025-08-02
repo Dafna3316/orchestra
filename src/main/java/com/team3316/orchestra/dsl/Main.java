@@ -20,7 +20,7 @@ class Main {
         }
 
         for (var file : args) {
-            outputPiece(new PieceLexer(CharStreams.fromFileName(file)), new ObjectOutputStream(new FileOutputStream(FilenameUtils.removeExtension(file))));
+            outputPiece(new PieceLexer(CharStreams.fromFileName(file)), new ObjectOutputStream(new FileOutputStream(FilenameUtils.removeExtension(file) + ".dbop")));
         }
     }
 

@@ -12,7 +12,7 @@ import com.team3316.orchestra.antlr.PieceParser;
 
 public class DslTest {
     private final String input = """
-        \\tuning "Kirnberger3" c' 264
+        \\tuning "Equal31" a' 440
         \\storage note
         \\tempo 4 = 124
         \\relative c' {

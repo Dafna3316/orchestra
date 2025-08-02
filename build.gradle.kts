@@ -28,6 +28,7 @@ dependencies {
 
     api("org.apache.commons", "commons-numbers-fraction", "1.2")
     implementation("org.apache.commons", "commons-lang3", "3.18.0")
+    implementation("commons-io", "commons-io", "2.20.0")
     compileOnly("org.jetbrains", "annotations", "26.0.2")
     antlr("org.antlr", "antlr4", "4.13.2")
 
@@ -56,7 +57,7 @@ java {
 }
 
 tasks.generateGrammarSource {
-    arguments = arguments + listOf("-visitor")
+    arguments = arguments + listOf("-visitor", "-no-listener")
 }
 
 tasks.named("sourcesJar") {
@@ -73,10 +74,17 @@ tasks.named<Test>("test") {
 
 tasks.register<Exec>("jshell") {
     dependsOn(tasks.classes)
-    val path = sourceSets["main"].runtimeClasspath.filter { it.exists() }.map { it.toString() }.joinToString(separator = System.getProperty("path.separator"))
+    val paths = sourceSets["main"].runtimeClasspath + sourceSets["test"].runtimeClasspath
+    val path = paths.filter { it.exists() }.map { it.toString() }.joinToString(separator = System.getProperty("path.separator"))
     logger.info(":jshell executing with --class-path {}", path)
     val shellArgs = listOf("-a", "jshell", "--class-path", path, "--startup", "DEFAULT", "--startup", "PRINTING")
     standardInput = System.`in`
     executable("rlwrap")
     args(shellArgs)
+}
+
+tasks.register<JavaExec>("dsl") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass = "com.team3316.orchestra.dsl.Main"
+    standardInput = System.`in`
 }

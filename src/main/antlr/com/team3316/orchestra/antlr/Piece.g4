@@ -29,12 +29,13 @@ music : relativeMusic | fixedMusic | seqMusic | musicAtom;
 relativeMusic : '\\relative' seqMusic | '\\relative' namedNote seqMusic ;
 fixedMusic : '\\fixed' seqMusic | '\\fixed' namedNote seqMusic;
 seqMusic : '{' (music '|'?)* '}';
-musicAtom : timedNN | timedPitch;
+musicAtom : timedNN | timedPitch | timedRest;
 
 timedNN : namedNote dur | namedNote;
 // The colon is useful for disambiguating
 // ...maybe
 timedPitch : pitch ':' dur | pitch ':';
+timedRest : 'r' dur | 'r';
 
 namedNote : NOTE_NAME octave;
 
@@ -50,13 +51,17 @@ octave returns[int result] : TICKS { $result = $TICKS.text.length(); }
 
 pitch returns[Pitch result] : frequency { $result = Pitch.of($frequency.result); }
     | inner=pitch '*' ratio { $result = $inner.result.upRatio($ratio.result); }
-    | inner=pitch '+' ratio { $result = $inner.result.upSemis($ratio.result); };
+    | inner=pitch '+' ratio { $result = $inner.result.upSemis($ratio.result); }
+    | inner=pitch '-' ratio { $result = $inner.result.downSemis($ratio.result); };
 ratio returns[Fraction result] : INT { $result = Fraction.of($INT.int); }
     | num=INT '/' den=INT { $result = Fraction.of($num.int, $den.int); };
 frequency returns[double result] : number { $result = $number.result; } ;
 number returns[double result] : INT { $result = (double) $INT.int; }
     | FLOAT { $result = Double.parseDouble($FLOAT.text); };
 
+STRING : '"' (~'"')* '"';
+BLOCK_COMMENT : '%{' .*? '%}' -> skip;
+LINE_COMMENT : '%%' ~('\n' | '\r')* -> skip;
 TICKS: '\''+;
 COMMAS: ','+;
 DOTS: '.'+;
@@ -74,5 +79,4 @@ PITCH_STORAGE : 'pitch';
 FREQ_STORAGE : 'frequency';
 FLOAT: [1-9][0-9]*'.'[0-9]+;
 INT: [1-9][0-9]*;
-STRING : '"' (~'"')* '"';
 SPACES : [ \t\r\n]+ -> skip;

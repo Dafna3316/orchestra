@@ -21,6 +21,7 @@ import com.team3316.orchestra.antlr.PieceParser.StorageDeclContext;
 import com.team3316.orchestra.antlr.PieceParser.TempoDeclContext;
 import com.team3316.orchestra.antlr.PieceParser.TimedNNContext;
 import com.team3316.orchestra.antlr.PieceParser.TimedPitchContext;
+import com.team3316.orchestra.antlr.PieceParser.TimedRestContext;
 import com.team3316.orchestra.antlr.PieceParser.TuningDeclContext;
 import com.team3316.orchestra.antlr.PieceParser.VoiceContext;
 import com.team3316.orchestra.antlr.PieceParser.VoicesContext;
@@ -32,6 +33,7 @@ import com.team3316.orchestra.time.Tempo;
 import com.team3316.orchestra.time.Timed;
 import com.team3316.orchestra.time.TimedFrequency;
 import com.team3316.orchestra.tuning.TuningSystem;
+import com.team3316.orchestra.tuning.temperament.Equal24;
 import com.team3316.orchestra.voice.Voice;
 import com.team3316.orchestra.voice.VoiceSupplier;
 
@@ -74,7 +76,7 @@ class PieceBuildVisitor extends PieceBaseVisitor<Object> {
     }
 
     // STATE
-    private TuningSystem sys = null;
+    private TuningSystem sys = new Equal24(NamedNote.of(Diatonic.A), Pitch.of(440.0));
     private Tempo tempo = new Tempo(Fraction.of(1, 4), Tempo.BPM.of(120));
     private ArrayList<VoiceSupplier> voices = new ArrayList<>();
     private boolean relativeMode = false; // Are we currently in relative mode?
@@ -138,11 +140,6 @@ class PieceBuildVisitor extends PieceBaseVisitor<Object> {
 
     @Override
     public Object visitVoices(VoicesContext ctx) {
-        if (sys == null) {
-            System.err.println("No tuning system set");
-            return null;
-        }
-
         voices.ensureCapacity(ctx.voice().size());
         return super.visitVoices(ctx);
     }
@@ -158,6 +155,7 @@ class PieceBuildVisitor extends PieceBaseVisitor<Object> {
 
     @Override
     public Object visitRelativeMusic(RelativeMusicContext ctx) {
+        final var previousMode = relativeMode;
         relativeMode = true;
 
         if (ctx.namedNote() != null) {
@@ -166,11 +164,14 @@ class PieceBuildVisitor extends PieceBaseVisitor<Object> {
             relativeNote = null;
         }
 
-        return super.visitRelativeMusic(ctx);
+        var result = super.visitRelativeMusic(ctx);
+        relativeMode = previousMode;
+        return result;
     }
 
     @Override
     public Object visitFixedMusic(FixedMusicContext ctx) {
+        final var previousMode = relativeMode;
         relativeMode = false;
 
         if (ctx.namedNote() != null) {
@@ -179,7 +180,9 @@ class PieceBuildVisitor extends PieceBaseVisitor<Object> {
             fixedOctave = 0;
         }
 
-        return super.visitFixedMusic(ctx);
+        var result = super.visitFixedMusic(ctx);
+        relativeMode = previousMode;
+        return result;
     }
 
     @Override
@@ -236,6 +239,18 @@ class PieceBuildVisitor extends PieceBaseVisitor<Object> {
             fb.add(new TimedFrequency(sys.interpret(timed.pitch()).frequency(), timed.duration()));
         else System.err.println("Warning: Voice found while building");
 
+        return null;
+    }
+
+    @Override
+    public Void visitTimedRest(TimedRestContext ctx) {
+        var latestVoice = voices.get(voices.size() - 1);
+        var dur = ctx.dur() == null ? lastDur : visitDur(ctx.dur());
+        lastDur = dur;
+
+        if (latestVoice instanceof Voice.NoteBuilder nb) nb.add(Timed.rest(dur));
+        else if (latestVoice instanceof Voice.PitchBuilder pb) pb.add(Timed.rest(dur));
+        else if (latestVoice instanceof Voice.FrequencyBuilder fb) fb.add(new TimedFrequency(0, dur));
         return null;
     }
 

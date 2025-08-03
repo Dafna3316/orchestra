@@ -3,14 +3,11 @@ package com.team3316.orchestra.dsl;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.team3316.orchestra.Piece;
 import com.team3316.orchestra.PiecesTest;
 import com.team3316.orchestra.antlr.PieceLexer;
-import com.team3316.orchestra.antlr.PieceParser;
 
 public class DslTest {
     private final String input = """

@@ -1,5 +1,7 @@
 package com.team3316.orchestra.dsl;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +26,11 @@ public class DslTest {
             g'8 a g f e4 c |
             c g c2 |
             c4 g c2
+            %% Line comment
+            %{
+            block
+            comment
+            %}
         }
         \\\\
         {
@@ -33,7 +40,7 @@ public class DslTest {
         \\\\
         \\relative c' {
             c4+8 d8 e4. c8 |
-            e4 c e2 |
+            e4 c e4 r |
             d4*3/2 e8 f f e d |
             f1 |
             e4. f8 g4. e8 |
@@ -46,10 +53,8 @@ public class DslTest {
     @Test
     @DisplayName("Example piece")
     void dslTest() {
-        var lexer = new PieceLexer(CharStreams.fromString(input));
-        var tokens = new CommonTokenStream(lexer);
-        var parser = new PieceParser(tokens);
-        var p = (Piece) parser.piece().accept(new PieceBuildVisitor());
-        PiecesTest.logPiece(p);
+        var piece = OrchestraDSL.readPiece(new PieceLexer(CharStreams.fromString(input)));
+        assertTrue(piece != null, "Parsing failed");
+        PiecesTest.logPiece(piece);
     }
 }

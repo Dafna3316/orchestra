@@ -3,13 +3,10 @@ package com.team3316.orchestra.dsl;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.io.FilenameUtils;
 import org.antlr.v4.runtime.CharStreams;
 
-import com.team3316.orchestra.Piece;
 import com.team3316.orchestra.antlr.PieceLexer;
-import com.team3316.orchestra.antlr.PieceParser;
 
 // Simple wrapper around the lexer & parser
 class Main {
@@ -25,15 +22,12 @@ class Main {
     }
 
     public static void outputPiece(PieceLexer in, ObjectOutputStream out) throws IOException {
-        var tokens = new CommonTokenStream(in);
-        var parser = new PieceParser(tokens);
-        var piece = parser.piece().accept(new PieceBuildVisitor());
-        if (piece instanceof Piece p) { // it better be
-            out.writeObject(p);
+        var piece = OrchestraDSL.readPiece(in);
+        if (piece != null) { // it better be
+            out.writeObject(piece);
             out.close();
         } else {
-            System.err.println("Parsing didn't return piece! (returned " + piece.getClass().getName() + ")");
-            System.exit(1);
+            System.err.println("Parsing failed!");
         }
     }
 }

@@ -15,6 +15,9 @@ import com.team3316.orchestra.tuning.TuningSystem;
  * <p>
  * This doesn't store any frequencies, only an abstract pitch which is to be
  * interpreted by a {@link TuningSystem}.
+ * @param name Name of the note
+ * @param accidental Accidental
+ * @param octave Octave, in Helmholtz style
  */
 public record NamedNote(Diatonic name, Accidental accidental, int octave) implements Comparable<NamedNote>, Serializable {
     /**

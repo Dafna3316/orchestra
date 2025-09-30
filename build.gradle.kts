@@ -7,20 +7,37 @@
 
 plugins {
     `java-library`
+    antlr
+    id("edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin") version "2025.0"
 }
 
 version = "0.1.1"
 group = "com.team3316"
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
+
+    maven {
+        url = uri("https://maven.ctr-electronics.com/release/")
+    }
 }
+wpilibRepositories.addAllReleaseRepositories(project)
 
 dependencies {
+    val wpilibVersion = "2025.3.2"
+
     api("org.apache.commons", "commons-numbers-fraction", "1.2")
     implementation("org.apache.commons", "commons-lang3", "3.18.0")
+    implementation("commons-io", "commons-io", "2.20.0")
     compileOnly("org.jetbrains", "annotations", "26.0.2")
+    antlr("org.antlr", "antlr4", "4.13.2")
+
+    implementation("edu.wpi.first.wpilibj", "wpilibj-java", wpilibVersion)
+    api("edu.wpi.first.wpilibNewCommands", "wpilibNewCommands-java", wpilibVersion)
+    implementation("edu.wpi.first.wpiutil", "wpiutil-java", wpilibVersion)
+    // implementation("edu.wpi.first.wpimath", "wpimath-java", wpilibVersion)
+    api("edu.wpi.first.wpiunits", "wpiunits-java", wpilibVersion)
+    implementation("com.ctre.phoenix6", "wpiapi-java", "25.4.0")
 
 	testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -39,10 +56,39 @@ java {
     withJavadocJar()
 }
 
+tasks.generateGrammarSource {
+    arguments = arguments + listOf("-visitor", "-no-listener")
+}
+
+tasks.named("sourcesJar") {
+    dependsOn(tasks.generateGrammarSource)
+}
+
+tasks.javadoc {
+    exclude("com/team3316/orchestra/antlr/**")
+}
+
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
     testLogging {
         events("skipped", "passed", "failed")
     }
+}
+
+tasks.register<Exec>("jshell") {
+    dependsOn(tasks.classes)
+    val paths = sourceSets["main"].runtimeClasspath + sourceSets["test"].runtimeClasspath
+    val path = paths.filter { it.exists() }.map { it.toString() }.joinToString(separator = System.getProperty("path.separator"))
+    logger.info(":jshell executing with --class-path {}", path)
+    val shellArgs = listOf("-a", "jshell", "--class-path", path, "--startup", "DEFAULT", "--startup", "PRINTING")
+    standardInput = System.`in`
+    executable("rlwrap")
+    args(shellArgs)
+}
+
+tasks.register<JavaExec>("dsl") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass = "com.team3316.orchestra.dsl.Main"
+    standardInput = System.`in`
 }

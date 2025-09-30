@@ -1,0 +1,272 @@
+package com.team3316.orchestra.dsl;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+import org.antlr.v4.runtime.misc.Pair;
+import org.apache.commons.numbers.fraction.Fraction;
+
+import com.team3316.orchestra.Piece;
+import com.team3316.orchestra.antlr.PieceBaseVisitor;
+import com.team3316.orchestra.antlr.PieceParser.DurContext;
+import com.team3316.orchestra.antlr.PieceParser.FixedMusicContext;
+import com.team3316.orchestra.antlr.PieceParser.NamedNoteContext;
+import com.team3316.orchestra.antlr.PieceParser.PieceContext;
+import com.team3316.orchestra.antlr.PieceParser.PitchContext;
+import com.team3316.orchestra.antlr.PieceParser.RelativeMusicContext;
+import com.team3316.orchestra.antlr.PieceParser.StorageDeclContext;
+import com.team3316.orchestra.antlr.PieceParser.TempoDeclContext;
+import com.team3316.orchestra.antlr.PieceParser.TimedNNContext;
+import com.team3316.orchestra.antlr.PieceParser.TimedPitchContext;
+import com.team3316.orchestra.antlr.PieceParser.TimedRestContext;
+import com.team3316.orchestra.antlr.PieceParser.TuningDeclContext;
+import com.team3316.orchestra.antlr.PieceParser.VoiceContext;
+import com.team3316.orchestra.antlr.PieceParser.VoicesContext;
+import com.team3316.orchestra.pitch.Accidental;
+import com.team3316.orchestra.pitch.Diatonic;
+import com.team3316.orchestra.pitch.NamedNote;
+import com.team3316.orchestra.pitch.Pitch;
+import com.team3316.orchestra.time.Tempo;
+import com.team3316.orchestra.time.Timed;
+import com.team3316.orchestra.time.TimedFrequency;
+import com.team3316.orchestra.tuning.TuningSystem;
+import com.team3316.orchestra.tuning.temperament.Equal24;
+import com.team3316.orchestra.voice.Voice;
+import com.team3316.orchestra.voice.VoiceSupplier;
+
+// Surprisingly not that long
+class PieceBuildVisitor extends PieceBaseVisitor<Object> {
+    // The only final field, unfortunately
+    private static final Map<String, Pair<Diatonic, Accidental>> names;
+
+    // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    private static void addNote(Map<String, Pair<Diatonic, Accidental>> map, String baseName, Diatonic note, boolean contract) {
+        map.put(baseName, new Pair<>(note, Accidental.NATURAL));
+        map.put(baseName + "es", new Pair<>(note, Accidental.FLAT));
+        map.put(baseName + "is", new Pair<>(note, Accidental.SHARP));
+        map.put(baseName + "eses", new Pair<>(note, Accidental.DOUBLE_FLAT));
+        map.put(baseName + "isis", new Pair<>(note, Accidental.DOUBLE_SHARP));
+        map.put(baseName + "eh", new Pair<>(note, Accidental.HALF_FLAT));
+        map.put(baseName + "ih", new Pair<>(note, Accidental.HALF_SHARP));
+        map.put(baseName + "eheh", new Pair<>(note, Accidental.SESQUIFLAT));
+        map.put(baseName + "ihih", new Pair<>(note, Accidental.SESQUISHARP));
+
+        if (contract) {
+            map.put(baseName + "s", new Pair<>(note, Accidental.FLAT));
+            map.put(baseName + "ses", new Pair<>(note, Accidental.DOUBLE_FLAT));
+            map.put(baseName + "h", new Pair<>(note, Accidental.HALF_FLAT));
+            map.put(baseName + "heh", new Pair<>(note, Accidental.SESQUIFLAT));
+        }
+    }
+
+    // static initializer!
+    static {
+        var map = new HashMap<String, Pair<Diatonic, Accidental>>(7 * 9);
+        addNote(map, "c", Diatonic.C, false);
+        addNote(map, "d", Diatonic.D, false);
+        addNote(map, "e", Diatonic.E, true);
+        addNote(map, "f", Diatonic.F, false);
+        addNote(map, "g", Diatonic.G, false);
+        addNote(map, "a", Diatonic.A, true);
+        addNote(map, "b", Diatonic.B, false);
+        names = Collections.unmodifiableMap(map);
+    }
+
+    // STATE
+    private TuningSystem sys = new Equal24(NamedNote.of(Diatonic.A), Pitch.of(440.0));
+    private Tempo tempo = new Tempo(Fraction.of(1, 4), Tempo.BPM.of(120));
+    private ArrayList<VoiceSupplier> voices = new ArrayList<>();
+    private boolean relativeMode = false; // Are we currently in relative mode?
+    private NamedNote relativeNote = null; // Previous note for relative mode
+    private Fraction lastDur = Fraction.of(1, 4); // Duration of last note
+    private int fixedOctave = 0; // Octave for fixed mode
+    private Supplier<VoiceSupplier> newForStorage = () -> new Voice.NoteBuilder(sys); // Very hacky
+
+    @Override
+    public Piece visitPiece(PieceContext ctx) {
+        super.visitPiece(ctx);
+        // dead simple
+        return new Piece(tempo, voices);
+    }
+
+    public Void visitTuningDecl(TuningDeclContext ctx) {
+        var stringLiteral = ctx.STRING().getText();
+        // yes this is how I get the contents of the string
+        var sys = TuningRegistry.lookup(stringLiteral.substring(1, stringLiteral.length() - 1));
+        if (sys == null) {
+            // 🪞
+            try {
+                Class<?> clazz = Class.forName(ctx.STRING().getText());
+                if (TuningSystem.class.isAssignableFrom(clazz)) {
+                    this.sys = (TuningSystem)
+                        (clazz.getConstructor(NamedNote.class, Pitch.class)
+                            .newInstance(visitNamedNote(ctx.namedNote()), visitPitch(ctx.pitch())));
+                }
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                // the safest
+                e.printStackTrace();
+                this.sys = null;
+            }
+        } else {
+            // please register your tuning systems so I don't have to reflect :(
+            this.sys = sys.construct(visitNamedNote(ctx.namedNote()), visitPitch(ctx.pitch()));
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitStorageDecl(StorageDeclContext ctx) {
+        // hacky hack
+        if (ctx.storage().NOTE_STORAGE() != null)
+            newForStorage = () -> new Voice.NoteBuilder(sys);
+        else if (ctx.storage().PITCH_STORAGE() != null)
+            newForStorage = Voice.PitchBuilder::new;
+        else if (ctx.storage().FREQ_STORAGE() != null)
+            newForStorage = Voice.FrequencyBuilder::new;
+
+        return null;
+    }
+
+    @Override
+    public Object visitTempoDecl(TempoDeclContext ctx) {
+        tempo = new Tempo(visitDur(ctx.dur()), Tempo.BPM.of(ctx.number().result));
+        return null;
+    }
+
+    @Override
+    public Object visitVoices(VoicesContext ctx) {
+        voices.ensureCapacity(ctx.voice().size());
+        return super.visitVoices(ctx);
+    }
+
+    @Override
+    public Object visitVoice(VoiceContext ctx) {
+        voices.add(newForStorage.get());
+        // Cleanup after previous voice
+        relativeMode = false;
+        fixedOctave = 0;
+        return super.visitVoice(ctx);
+    }
+
+    @Override
+    public Object visitRelativeMusic(RelativeMusicContext ctx) {
+        final var previousMode = relativeMode;
+        relativeMode = true;
+
+        if (ctx.namedNote() != null) {
+            relativeNote = visitNamedNote(ctx.namedNote());
+        } else {
+            relativeNote = null;
+        }
+
+        var result = super.visitRelativeMusic(ctx);
+        relativeMode = previousMode;
+        return result;
+    }
+
+    @Override
+    public Object visitFixedMusic(FixedMusicContext ctx) {
+        final var previousMode = relativeMode;
+        relativeMode = false;
+
+        if (ctx.namedNote() != null) {
+            fixedOctave = ctx.namedNote().octave().result;
+        } else {
+            fixedOctave = 0;
+        }
+
+        var result = super.visitFixedMusic(ctx);
+        relativeMode = previousMode;
+        return result;
+    }
+
+    @Override
+    public Void visitTimedPitch(TimedPitchContext ctx) {
+        var pitch = Timed.of(visitPitch(ctx.pitch()), ctx.dur() == null ? lastDur : visitDur(ctx.dur()));
+        var latestVoice = voices.get(voices.size() - 1);
+        lastDur = pitch.duration();
+
+        if (latestVoice instanceof Voice.NoteBuilder nb) {
+            System.err.println("Warning: specializing storage to Pitches for this voice");
+            var pb = nb.pitches();
+            pb.add(Timed.of(pitch.pitch(), pitch.duration()));
+            voices.set(voices.size() - 1, pb);
+        } else if (latestVoice instanceof Voice.PitchBuilder pb) {
+            pb.add(pitch);
+        } else if (latestVoice instanceof Voice.FrequencyBuilder fb) {
+            fb.add(new TimedFrequency(pitch.pitch().frequency(), pitch.duration()));
+        } else {
+            System.err.println("Warning: Voice found while building");
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitTimedNN(TimedNNContext ctx) {
+        // Obtain the note and duration separately
+        var dur = ctx.dur() == null ? lastDur : visitDur(ctx.dur());
+        var raw = visitNamedNote(ctx.namedNote());
+        var newOctave = raw.octave();
+        if (relativeMode && relativeNote != null) {
+            // The difference is the poor man's interval
+            var diff = raw.name().ordinal() - relativeNote.name().ordinal();
+            newOctave += relativeNote.octave();
+            if (Math.abs(diff) >= 4) { // Wider than a fifth (4)
+                // Surely there's a better way to do this
+                if (diff > 0) newOctave--;
+                else newOctave++;
+            }
+        } else {
+            // Fixed mode is the easiest!
+            newOctave += fixedOctave;
+        }
+
+        lastDur = dur;
+        var timed = Timed.of(NamedNote.of(raw.name(), raw.accidental(), newOctave), dur);
+        if (relativeMode) relativeNote = timed.pitch();
+        var latestVoice = voices.get(voices.size() - 1);
+
+        if (latestVoice instanceof Voice.NoteBuilder nb) nb.add(timed);
+        else if (latestVoice instanceof Voice.PitchBuilder pb)
+            pb.add(Timed.of(sys.interpret(timed.pitch()), timed.duration()));
+        else if (latestVoice instanceof Voice.FrequencyBuilder fb)
+            fb.add(new TimedFrequency(sys.interpret(timed.pitch()).frequency(), timed.duration()));
+        else System.err.println("Warning: Voice found while building");
+
+        return null;
+    }
+
+    @Override
+    public Void visitTimedRest(TimedRestContext ctx) {
+        var latestVoice = voices.get(voices.size() - 1);
+        var dur = ctx.dur() == null ? lastDur : visitDur(ctx.dur());
+        lastDur = dur;
+
+        if (latestVoice instanceof Voice.NoteBuilder nb) nb.add(Timed.rest(dur));
+        else if (latestVoice instanceof Voice.PitchBuilder pb) pb.add(Timed.rest(dur));
+        else if (latestVoice instanceof Voice.FrequencyBuilder fb) fb.add(new TimedFrequency(0, dur));
+        return null;
+    }
+
+    @Override
+    public NamedNote visitNamedNote(NamedNoteContext ctx) {
+        final var pair = names.get(ctx.NOTE_NAME().getText());
+        return NamedNote.of(pair.a, pair.b, ctx.octave().result);
+    }
+
+    @Override
+    public Pitch visitPitch(PitchContext ctx) {
+        return ctx.result;
+    }
+
+    @Override
+    public Fraction visitDur(DurContext ctx) {
+        return ctx.result;
+    }
+}
